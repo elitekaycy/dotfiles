@@ -15,7 +15,7 @@ dynamic_title= true
 save_to_clipboard = true
 
 [font.normal]
-family = "SFMono Nerd Font"
+family = "JetBrainsMono NF"
 style = "Regular"
 
 [keyboard]
