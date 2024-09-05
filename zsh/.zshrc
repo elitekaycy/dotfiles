@@ -2,13 +2,13 @@
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
 # Path to your Oh My Zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh/strug.zsh-theme"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="robbyrussell"
+ZSH_THEME="strug"
 
 
 # Set list of themes to pick from when loading at random
@@ -73,7 +73,7 @@ ZSH_THEME="robbyrussell"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git)
 
-source $ZSH/oh-my-zsh.sh
+# source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
@@ -104,6 +104,9 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+# Display Pokemon-colorscripts
+# Project page: https://gitlab.com/phoneybadger/pokemon-colorscripts#on-other-distros-and-macos
+pokemon-colorscripts --no-title -s -r
 
 ZNAP_LOCATION=~/zsh-plugins/znap
 [[ -r $ZNAP_LOCATION/znap.zsh ]] ||
@@ -128,6 +131,20 @@ znap install aureliojargas/clitest zsh-users/zsh-completions
 
 alias cat="batcat"
 
+
+# TMUX SESSION EXIST OR CREATE
+
+# Check if tmux is already running
+if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+    # Check if there is any existing tmux session
+    if tmux ls &> /dev/null; then
+        # Attach to the first available tmux session
+        tmux attach-session -t 0
+    else
+        # Start a new tmux session
+        tmux new-session
+    fi
+fi
 
 
 #UPDATES START FROM HERE-------------------------------------------------------------------
@@ -178,3 +195,23 @@ _fzf_comprun() {
 export BAT_THEME=tokyonight_night
 alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions"
 
+# Kubectl sources
+alias kubectl="minikube kubectl --"
+alias kpf= "kubectl port-forward"
+alias k="kubectl"
+alias kaf="kubectl apply -f"
+alias kdf="kubectl delete -f"
+
+
+# Source java from asdf to java home
+export JAVA_HOME="$(asdf where java)"
+export PATH="$JAVA_HOME/bin:$PATH"
+
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+#
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+
+alias me="cd /mnt/c/Users/DicksonAnyaele/"
