@@ -1,0 +1,3 @@
+[submodule "pvim/.config/pvim"]
+	path = pvim/.config/pvim
+	url = https://github.com/elitekaycy/pvim.git
