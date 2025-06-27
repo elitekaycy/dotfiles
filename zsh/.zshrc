@@ -2,20 +2,25 @@
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
 # Path to your Oh My Zsh installation.
-export ZSH="$HOME/.oh-my-zsh/strug.zsh-theme"
+# export ZSH="$HOME/.oh-my-zsh/strug.zsh-theme"
+
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="strug"
+# ZSH_THEME="strug"
 
 
-# Set name of the theme to load --- if set to "random", it will
+# Seong-chiamiov-plus" name of the theme to load --- if set to "random", it will
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 # ZSH_THEME="robbyrussell"
+
+export ZSH="$HOME/.oh-my-zsh"
+
+ZSH_THEME="xiong-chiamiov-plus"
 
 
 
@@ -151,7 +156,7 @@ if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
     else
         # Start a new tmux session
         tmux new-session
-    fi
+   fi
 fi
 
 
@@ -223,3 +228,27 @@ export SDKMAN_DIR="$HOME/.sdkman"
 
 
 alias me="cd /mnt/c/Users/DicksonAnyaele/"
+
+alias dps='docker ps --format "{{.Names}}\t{{.Ports}}\t{{.Image}}" | awk '\''BEGIN { printf "\033[1;34m%-25s\033[0m \033[1;32m%-40s\033[0m \033[1;36m%-20s\033[0m\n", "NAME", "PORTS", "IMAGE" } 
+    { printf "\033[1;34m%-25s\033[0m \033[1;32m%-40s\033[0m \033[1;36m%-20s\033[0m\n", $1, $2, $3 }'\'''
+
+export PATH="/home/dickson/bin/Sencha/Cmd:$PATH"
+
+setopt pushd_ignore_dups pushd_silent
+
+
+# pnpm
+export PNPM_HOME="/home/dickson/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+export CATALINA_HOME=$(asdf where tomcat)
+export JAVA_HOME=$(asdf where java)
+alias pvim='NVIM_APPNAME=pvim nvim'
+
+. "$HOME/.atuin/bin/env"
+
+eval "$(atuin init zsh)"
+alias scaffold='bash /home/dickson/Desktop/cli/scaffold-module-java/scaffold.sh'
