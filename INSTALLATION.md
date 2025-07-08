@@ -8,13 +8,28 @@ These are the essential packages required for the dotfiles to work.
 
 *   **stow**: Used to manage the dotfiles by creating symbolic links.
 *   **git**: Required for cloning the repository and managing submodules.
+
+```bash
+sudo apt-get update
+sudo apt-get install -y stow git
+```
+
+## Zsh
+
 *   **zsh**: The Z shell, which is the primary shell environment.
 *   **Oh My Zsh**: A framework for managing your zsh configuration.
-*   **tmux**: A terminal multiplexer.
-*   **Neovim**: A modern, highly extensible text editor.
+*   **atuin**: A tool that replaces your existing shell history with a SQLite database.
+
+```bash
+sudo apt-get install -y zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+bash <(curl https://raw.githubusercontent.com/ellie/atuin/main/install.sh)
+```
+
+## i3
+
 *   **i3**: A tiling window manager.
 *   **i3status**: A status bar for i3.
-*   **kitty**: A GPU-based terminal emulator.
 *   **rofi**: A window switcher, application launcher, and dmenu replacement.
 *   **dmenu**: A dynamic menu for X.
 *   **feh**: A light-weight image viewer, used here to set the wallpaper.
@@ -25,34 +40,11 @@ These are the essential packages required for the dotfiles to work.
 *   **acpi**: A tool to display information about ACPI devices, used here for battery status.
 *   **amixer**: A command-line mixer for ALSA sound-card driver.
 *   **sensors**: A tool to show readings from hardware sensors.
-*   **bat**: A cat(1) clone with wings, used for syntax highlighting.
-*   **fd**: A simple, fast and user-friendly alternative to `find`.
-*   **fzf**: A command-line fuzzy finder.
-*   **eza**: A modern replacement for `ls`.
-*   **asdf**: A CLI tool that can manage multiple language runtime versions on a per-project basis.
-*   **atuin**: A tool that replaces your existing shell history with a SQLite database.
-
-## Fonts
-
-The following fonts are used in the configurations:
-
-*   **JetBrains Mono Nerd Font**: Used in the i3 and kitty configurations.
-
-## Installation Commands
-
-Here are the commands to install the dependencies on a Debian-based system (e.g., Ubuntu):
 
 ```bash
-sudo apt-get update
 sudo apt-get install -y \
-    stow \
-    git \
-    zsh \
-    tmux \
-    neovim \
     i3 \
     i3status \
-    kitty \
     rofi \
     dmenu \
     feh \
@@ -62,30 +54,51 @@ sudo apt-get install -y \
     xinput \
     acpi \
     alsa-utils \
-    lm-sensors \
-    bat \
-    fd-find \
-    fzf \
-    eza
+    lm-sensors
 ```
 
-### Installing Oh My Zsh
+## Kitty
+
+*   **kitty**: A GPU-based terminal emulator.
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+sudo apt-get install -y kitty
 ```
 
-### Installing asdf
+## Tmux
+
+*   **tmux**: A terminal multiplexer.
 
 ```bash
+sudo apt-get install -y tmux
+```
+
+## Neovim
+
+*   **Neovim**: A modern, highly extensible text editor.
+
+```bash
+sudo apt-get install -y neovim
+```
+
+## Other Tools
+
+*   **bat**: A cat(1) clone with wings, used for syntax highlighting.
+*   **fd**: A simple, fast and user-friendly alternative to `find`.
+*   **fzf**: A command-line fuzzy finder.
+*   **eza**: A modern replacement for `ls`.
+*   **asdf**: A CLI tool that can manage multiple language runtime versions on a per-project basis.
+
+```bash
+sudo apt-get install -y bat fd-find fzf eza
 git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.2
 ```
 
-### Installing atuin
+## Fonts
 
-```bash
-bash <(curl https://raw.githubusercontent.com/ellie/atuin/main/install.sh)
-```
+The following fonts are used in the configurations:
+
+*   **JetBrains Mono Nerd Font**: Used in the i3 and kitty configurations.
 
 ## Notes
 
