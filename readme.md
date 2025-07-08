@@ -52,5 +52,6 @@ If you have already cloned the repository without the submodules, you can initia
 git submodule update --init --recursive
 ```
 
+<!--![eg](./docs/i3doc.png)-->
 ![eg](./docs/i3doc.png)
 
