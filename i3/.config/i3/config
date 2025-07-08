@@ -66,6 +66,14 @@ bindsym $mod+Shift+space floating toggle
 # Change focus between tiling / floating windows
 bindsym $mod+space focus mode_toggle
 
+# Launch flameshot GUI to select area
+bindsym $mod+Shift+s exec --no-startup-id flameshot gui
+# Take fullscreen screenshot, save to ~/Pictures with timestamp
+bindsym $mod+Shift+f exec --no-startup-id flameshot full -p ~/Pictures
+bindsym $mod+Shift+c exec --no-startup-id flameshot gui -c
+
+
+
 set $ws1 "1:   "
 set $ws2 "2:   "
 set $ws3 "3:   "
