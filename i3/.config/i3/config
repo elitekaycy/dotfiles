@@ -13,6 +13,22 @@ gaps outer 4
 
 smart_gaps off
 
+# brightness
+bindsym XF86MonBrightnessDown exec brightnessctl set 10%-
+
+# Increase brightness
+bindsym XF86MonBrightnessUp exec brightnessctl set +10%
+
+# Volume up
+bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
+
+# Volume down
+bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
+
+# Mute/unmute
+bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
+
+
 
 # Key bindings
 bindsym $mod+Return exec kitty
@@ -35,7 +51,6 @@ bindsym $mod+Shift+j move down
 bindsym $mod+Shift+k move up
 bindsym $mod+Shift+l move right
 
-# Arrow keys as alternative
 bindsym $mod+Left focus left
 bindsym $mod+Down focus down
 bindsym $mod+Up focus up
@@ -47,7 +62,6 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 
-# SPLIT
 bindsym $mod+a split v
 bindsym $mod+minus split h
 bindsym $mod+equal layout toggle split
@@ -128,6 +142,9 @@ exec --no-startup-id i3-msg "workspace $ws1"
 exec --no-startup-id i3-msg "workspace $ws2"
 exec --no-startup-id i3-msg "workspace $ws3"
 exec --no-startup-id i3-msg "workspace $ws4"
+
+# privacy red light
+exec --no-startup-id redshift -l auto
 
 # Launch Slack on workspace 4
 # add slack to workspace 4

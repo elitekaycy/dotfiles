@@ -122,3 +122,5 @@ fi
 export PATH=$HOME/.local/bin:$PATH
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path bash)"

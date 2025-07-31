@@ -256,3 +256,10 @@ alias pvim='NVIM_APPNAME=pvim nvim'
 
 eval "$(atuin init zsh)"
 alias scaffold='bash /home/dickson/Desktop/cli/scaffold-module-java/scaffold.sh'
+
+
+# Load z
+. ~/z/z.sh
+
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
+export AWS_PROFILE=sandbox-elitekaycy
