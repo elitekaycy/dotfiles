@@ -322,7 +322,7 @@ stow_dotfiles() {
     cd "$DOTFILES_DIR"
 
     # List of directories to stow
-    local configs=(bash zsh i3 i3status kitty tmux nvim pvim)
+    local configs=(bash zsh i3 i3status kitty tmux nvim pvim rofi)
 
     for config in "${configs[@]}"; do
         if [[ -d "$config" ]]; then

@@ -37,7 +37,7 @@ bindsym $mod+Shift+q kill
 bindsym $mod+Shift+r restart
 bindsym $mod+z exec zen
 bindsym $mod+b exec firefox
-bindsym $mod+p exec dmenu_run
+bindsym $mod+p exec dmenu_run -fn 'JetBrainsMono Nerd Font-12' -nb '#1a1b26' -nf '#c0caf5' -sb '#7aa2f7' -sf '#1a1b26'
 bindsym $mod+f fullscreen toggle
 
 # Launch tmux sessions
@@ -177,8 +177,6 @@ bar {
     position top
     font pango:JetBrainsMono Nerd Font 11
     height 28
-    separator_symbol "  "
-    strip_workspace_numbers yes
     workspace_min_width 40
     colors {
         background $bg
