@@ -171,8 +171,9 @@ animation-low-framerate = 500
 
 [module/power]
 type = custom/text
-format =
+format = "  "
 format-foreground = ${colors.alert}
+format-padding = 1
 click-left = ~/.config/polybar/scripts/rofi-power.sh
 
 [settings]
