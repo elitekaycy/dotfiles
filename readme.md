@@ -117,6 +117,7 @@ If you prefer to install specific components:
 | Key | Action |
 |-----|--------|
 | `Mod+t` | Theme switcher (rofi) |
+| `Mod+Shift+b` | Wallpaper picker (rofi) |
 | `Mod+Escape` | Lock screen |
 | `Mod+v` | Clipboard history (rofi) |
 | `XF86AudioPlay` | Play/pause media |
@@ -227,7 +228,9 @@ Uses vim-tmux-navigator for seamless pane switching:
 
 ## Theme Switcher
 
-Press `Mod+t` to open the theme picker. Changes apply to polybar, kitty, rofi, dunst, and neovim simultaneously.
+Press `Mod+t` to open the theme picker. Changes apply to polybar, kitty, rofi, dunst, and neovim simultaneously. Wallpaper auto-changes to match the theme.
+
+Press `Mod+Shift+b` to manually pick a wallpaper from `~/Pictures/wallpapers/`.
 
 **Available Themes:**
 | Theme | Type |

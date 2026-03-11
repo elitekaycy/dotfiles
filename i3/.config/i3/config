@@ -44,6 +44,9 @@ bindsym $mod+v exec rofi -modi "clipboard:greenclip print" -show clipboard
 # Theme switcher
 bindsym $mod+t exec ~/.config/themes/scripts/rofi-theme-picker.sh
 
+# Wallpaper picker
+bindsym $mod+Shift+b exec ~/.config/polybar/scripts/rofi-wallpaper.sh
+
 # Key bindings
 bindsym $mod+Return exec kitty
 bindsym $mod+d exec rofi -show drun
