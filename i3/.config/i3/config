@@ -194,23 +194,8 @@ set $magenta    #bb9af7
 set $cyan       #7dcfff
 set $white      #a9b1d6
 
-bar {
-    status_command i3blocks -c ~/.config/i3/i3blocks.conf
-    position top
-    font pango:JetBrainsMono Nerd Font 11
-    height 28
-    workspace_min_width 40
-    colors {
-        background $bg
-        statusline $fg
-        separator  $black
-        #                  border   bg       text
-        focused_workspace  $blue    $blue    $bg
-        active_workspace   $bg      $bg      $fg
-        inactive_workspace $bg      $bg      $white
-        urgent_workspace   $red     $red     $bg
-    }
-}
+# Polybar (replaces i3bar)
+exec_always --no-startup-id ~/.config/polybar/launch.sh
 
 for_window [class=".*"] border pixel 1
 

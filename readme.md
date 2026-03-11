@@ -42,6 +42,7 @@ If you prefer to install specific components:
 | Config | Description |
 |--------|-------------|
 | **i3** | Tiling WM with Tokyo Night theme, vim-style navigation |
+| **polybar** | Status bar with clickable WiFi/Bluetooth/Power menus |
 | **kitty** | GPU-accelerated terminal |
 | **tmux** | Terminal multiplexer with vim bindings, TPM plugins |
 | **zsh** | Shell with znap, pure prompt, autosuggestions, syntax highlighting |
@@ -119,6 +120,14 @@ If you prefer to install specific components:
 | `Mod+v` | Clipboard history (rofi) |
 | `XF86AudioPlay` | Play/pause media |
 | `XF86AudioNext/Prev` | Next/previous track |
+
+#### Polybar (click controls)
+| Module | Left Click |
+|--------|------------|
+| WiFi icon | Rofi network menu (connect/disconnect/scan) |
+| Bluetooth icon | Rofi bluetooth menu (pair/connect) |
+| Volume | (right-click) Open pavucontrol |
+| Power icon | Rofi power menu (lock/logout/suspend/reboot/shutdown) |
 
 ---
 
@@ -232,10 +241,10 @@ Uses vim-tmux-navigator for seamless pane switching:
 
 Auto-installed by `install.sh`:
 
-- **Window Manager:** i3, i3blocks, rofi, dmenu, feh, picom, dunst
+- **Window Manager:** i3, polybar, rofi, dmenu, feh, picom, dunst
 - **Terminal:** kitty, tmux, zsh
 - **Editor:** neovim
-- **Tools:** bat, fd, fzf, eza, ripgrep, btop, flameshot, redshift, playerctl, greenclip
+- **Tools:** bat, fd, fzf, eza, ripgrep, btop, flameshot, redshift, playerctl, greenclip, pavucontrol
 - **Security:** i3lock, xss-lock
 - **Fonts:** JetBrains Mono Nerd Font
 

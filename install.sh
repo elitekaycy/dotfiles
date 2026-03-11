@@ -83,74 +83,74 @@ install_i3() {
         debian)
             pkg_install \
                 i3 \
-                i3blocks \
                 i3lock \
                 rofi \
                 dmenu \
                 feh \
                 brightnessctl \
                 network-manager-gnome \
-                volumeicon-alsa \
                 blueman \
                 xinput \
                 acpi \
                 alsa-utils \
                 pulseaudio-utils \
+                pavucontrol \
                 lm-sensors \
                 redshift \
                 flameshot \
                 picom \
                 dunst \
                 playerctl \
-                xss-lock
+                xss-lock \
+                polybar
             ;;
         fedora)
             pkg_install \
                 i3 \
-                i3blocks \
                 i3lock \
                 rofi \
                 dmenu \
                 feh \
                 brightnessctl \
                 network-manager-applet \
-                volumeicon \
                 blueman \
                 xinput \
                 acpi \
                 alsa-utils \
                 pulseaudio-utils \
+                pavucontrol \
                 lm_sensors \
                 redshift \
                 flameshot \
                 picom \
                 dunst \
                 playerctl \
-                xss-lock
+                xss-lock \
+                polybar
             ;;
         arch)
             pkg_install \
                 i3-wm \
-                i3blocks \
                 i3lock \
                 rofi \
                 dmenu \
                 feh \
                 brightnessctl \
                 network-manager-applet \
-                volumeicon \
                 blueman \
                 xorg-xinput \
                 acpi \
                 alsa-utils \
                 pulseaudio \
+                pavucontrol \
                 lm_sensors \
                 redshift \
                 flameshot \
                 picom \
                 dunst \
                 playerctl \
-                xss-lock
+                xss-lock \
+                polybar
             ;;
     esac
 
@@ -353,7 +353,7 @@ stow_dotfiles() {
     cd "$DOTFILES_DIR"
 
     # List of directories to stow
-    local configs=(bash zsh i3 i3status kitty tmux nvim pvim rofi dunst picom)
+    local configs=(bash zsh i3 kitty tmux nvim pvim rofi dunst picom polybar)
 
     for config in "${configs[@]}"; do
         if [[ -d "$config" ]]; then
@@ -389,6 +389,10 @@ make_executable() {
 
     chmod +x "$DOTFILES_DIR"/i3/.config/i3/*.sh 2>/dev/null || true
     chmod +x "$HOME"/.config/i3/*.sh 2>/dev/null || true
+    chmod +x "$DOTFILES_DIR"/polybar/.config/polybar/*.sh 2>/dev/null || true
+    chmod +x "$DOTFILES_DIR"/polybar/.config/polybar/scripts/*.sh 2>/dev/null || true
+    chmod +x "$HOME"/.config/polybar/*.sh 2>/dev/null || true
+    chmod +x "$HOME"/.config/polybar/scripts/*.sh 2>/dev/null || true
 
     log_success "Scripts are executable"
 }
