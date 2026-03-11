@@ -1,29 +1,22 @@
 #!/usr/bin/env bash
-# Neovim installation
+# Neovim - managed by mise
+# See mise/.config/mise/config.toml
 
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
 install_neovim() {
-    log_info "Installing Neovim..."
+    if has nvim; then
+        log_success "Neovim already installed ($(nvim --version | head -1))"
+        return
+    fi
 
-    case "$OS" in
-        debian)
-            # Ubuntu/Debian repos have old nvim, use AppImage
-            if ! has nvim || [[ $(nvim --version | head -1 | grep -oP '\d+\.\d+' | head -1) < "0.9" ]]; then
-                log_info "Installing latest Neovim via AppImage..."
-                curl -Lo /tmp/nvim.appimage "https://github.com/neovim/neovim/releases/latest/download/nvim.appimage"
-                chmod +x /tmp/nvim.appimage
-                sudo mv /tmp/nvim.appimage /usr/local/bin/nvim
-            fi
-            ;;
-        fedora)
-            pkg_install neovim
-            ;;
-        arch)
-            pkg_install neovim
-            ;;
-    esac
+    if ! has mise; then
+        log_error "mise not installed. Run ./install.sh zsh first."
+        return 1
+    fi
 
+    log_info "Installing Neovim via mise..."
+    mise install neovim
     log_success "Neovim installed"
 }
 

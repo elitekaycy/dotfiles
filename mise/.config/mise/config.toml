@@ -9,12 +9,19 @@ maven = "3.9"
 gradle = "8"
 pnpm = "latest"
 
-# CLI tools
+# CLI tools (previously manual apt/script installs)
 eza = "latest"
 fd = "latest"
 delta = "latest"
 lazydocker = "latest"
 lazygit = "latest"
+bat = "latest"
+ripgrep = "latest"
+btop = "latest"
+jq = "latest"
+fzf = "latest"
+gh = "latest"
+neovim = "latest"
 
 [settings]
 experimental = true

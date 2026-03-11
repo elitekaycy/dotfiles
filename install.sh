@@ -40,13 +40,10 @@ show_help() {
     echo "  core       Core packages (git, stow, curl, etc.)"
     echo "  i3         i3 window manager and tools"
     echo "  terminal   Kitty, tmux, zsh"
-    echo "  neovim     Neovim (latest via AppImage on Debian/Ubuntu)"
-    echo "  devtools   bat, fd, fzf, eza, ripgrep, btop, jq"
+    echo "  devtools   All CLI tools via mise (bat, fd, fzf, eza, rg, etc.)"
     echo "  docker     Docker and Docker Compose"
     echo "  chrome     Google Chrome browser"
     echo "  languages  Node.js, Java, Python via mise"
-    echo "  gh         GitHub CLI"
-    echo "  lazygit    Lazygit TUI"
     echo "  fonts      JetBrains Mono Nerd Font"
     echo "  greenclip  Clipboard manager"
     echo "  rust       Rust toolchain"
@@ -81,21 +78,21 @@ main() {
     pkg_update
     echo ""
 
-    # Install packages
+    # System packages (need apt/dnf/pacman)
     install_core
     install_i3
     install_greenclip
     install_terminal
-    install_neovim
-    install_devtools
-    install_gh
-    install_lazygit
-    install_delta
     install_docker
     install_chrome
     install_rust
-    install_zsh_ecosystem
     install_fonts
+
+    # Zsh ecosystem (installs mise)
+    install_zsh_ecosystem
+
+    # Everything else via mise
+    install_devtools
     install_languages
 
     echo ""
@@ -137,11 +134,8 @@ case "$1" in
     terminal)
         pkg_update && install_terminal
         ;;
-    neovim)
-        install_neovim
-        ;;
     devtools)
-        pkg_update && install_devtools
+        install_devtools
         ;;
     fonts)
         install_fonts
@@ -181,12 +175,6 @@ case "$1" in
         ;;
     languages)
         install_languages
-        ;;
-    gh)
-        install_gh
-        ;;
-    lazygit)
-        install_lazygit
         ;;
     wallpapers)
         setup_wallpapers
