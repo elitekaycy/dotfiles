@@ -12,15 +12,7 @@
 # ZSH_THEME="strug"
 
 
-# Seong-chiamiov-plus" name of the theme to load --- if set to "random", it will
-# load a random theme each time Oh My Zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-# ZSH_THEME="robbyrussell"
-
 export ZSH="$HOME/.oh-my-zsh"
-
-ZSH_THEME="xiong-chiamiov-plus"
 
 
 
@@ -85,11 +77,7 @@ ZSH_THEME="xiong-chiamiov-plus"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 
-plugins=(
-  git
-  zsh-autosuggestions
-  zsh-syntax-highlighting
-)
+plugins=(git)
 # source $ZSH/oh-my-zsh.sh
 
 # User configuration
@@ -121,9 +109,9 @@ plugins=(
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# Display Pokemon-colorscripts
+# Display Pokemon-colorscripts (if installed)
 # Project page: https://gitlab.com/phoneybadger/pokemon-colorscripts#on-other-distros-and-macos
-pokemon-colorscripts --no-title -s -r
+command -v pokemon-colorscripts &>/dev/null && pokemon-colorscripts --no-title -s -r
 
 ZNAP_LOCATION=~/zsh-plugins/znap
 [[ -r $ZNAP_LOCATION/znap.zsh ]] ||
@@ -137,16 +125,15 @@ znap prompt sindresorhus/pure
 # `znap source` starts plugins.
 znap source marlonrichert/zsh-autocomplete
 
-# `znap eval` makes evaluating generated command output up to 10 times faster.
-znap eval iterm2 'curl -fsSL https://iterm2.com/shell_integration/zsh'
-
 # `znap install` adds new commands and completions.
-znap install aureliojargas/clitest zsh-users/zsh-completions
+znap install zsh-users/zsh-completions
 
+# Load asdf if installed
+[[ -f "$HOME/.asdf/asdf.sh" ]] && . "$HOME/.asdf/asdf.sh"
 
-. "$HOME/.asdf/asdf.sh"
-
-alias cat="batcat"
+# Use bat as cat (if installed)
+command -v batcat &>/dev/null && alias cat="batcat"
+command -v bat &>/dev/null && alias cat="bat"
 
 
 # TMUX SESSION EXIST OR CREATE
@@ -214,15 +201,17 @@ alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time
 
 # Kubectl sources
 alias kubectl="minikube kubectl --"
-alias kpf= "kubectl port-forward"
+alias kpf="kubectl port-forward"
 alias k="kubectl"
 alias kaf="kubectl apply -f"
 alias kdf="kubectl delete -f"
 
 
-# Source java from asdf to java home
-export JAVA_HOME="$(asdf where java)"
-export PATH="$JAVA_HOME/bin:$PATH"
+# Source java from asdf to java home (if available)
+if command -v asdf &>/dev/null && asdf where java &>/dev/null; then
+    export JAVA_HOME="$(asdf where java)"
+    export PATH="$JAVA_HOME/bin:$PATH"
+fi
 
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
@@ -231,35 +220,67 @@ export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 
-alias me="cd /mnt/c/Users/DicksonAnyaele/"
-
 alias dps='docker ps --format "{{.Names}}\t{{.Ports}}\t{{.Image}}" | awk '\''BEGIN { printf "\033[1;34m%-25s\033[0m \033[1;32m%-40s\033[0m \033[1;36m%-20s\033[0m\n", "NAME", "PORTS", "IMAGE" } 
     { printf "\033[1;34m%-25s\033[0m \033[1;32m%-40s\033[0m \033[1;36m%-20s\033[0m\n", $1, $2, $3 }'\'''
 
-export PATH="/home/dickson/bin/Sencha/Cmd:$PATH"
+export PATH="$HOME/bin/Sencha/Cmd:$PATH"
 
 setopt pushd_ignore_dups pushd_silent
 
 
 # pnpm
-export PNPM_HOME="/home/dickson/.local/share/pnpm"
+export PNPM_HOME="$HOME/.local/share/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
-export CATALINA_HOME=$(asdf where tomcat)
-export JAVA_HOME=$(asdf where java)
-alias pvim='NVIM_APPNAME=pvim nvim'
 
-. "$HOME/.atuin/bin/env"
+# Tomcat/Java from asdf (if available)
+command -v asdf &>/dev/null && asdf where tomcat &>/dev/null && export CATALINA_HOME=$(asdf where tomcat)
+command -v asdf &>/dev/null && asdf where java &>/dev/null && export JAVA_HOME=$(asdf where java)
 
-eval "$(atuin init zsh)"
-alias scaffold='bash /home/dickson/Desktop/cli/scaffold-module-java/scaffold.sh'
+# Atuin shell history (if installed)
+[[ -f "$HOME/.atuin/bin/env" ]] && . "$HOME/.atuin/bin/env"
+command -v atuin &>/dev/null && eval "$(atuin init zsh)"
+alias scaffold='bash $HOME/Desktop/cli/scaffold-module-java/scaffold.sh'
 
+
+# Auto-install z if not present
+[[ ! -f ~/z/z.sh ]] && git clone --depth 1 https://github.com/rupa/z.git ~/z
 
 # Load z
 . ~/z/z.sh
 
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
 export AWS_PROFILE=sandbox-elitekaycy
+alias minio-setup="mc alias set local http://localhost:9000 minioadmin minioadmin"
+
+
+# Shutdown aliases
+alias adios="sudo shutdown now"
+alias aloha="sudo shutdown now"
+alias sayanora="sudo shutdown now"
+alias killmenow="sudo shutdown now"
+alias shutdown="sudo shutdown now"
+alias sss="sudo shutdown now"
+
+# Restart aliases
+alias reboot="sudo reboot"
+alias rr="sudo reboot"
+
+# Load Angular CLI autocompletion (if installed)
+command -v ng &>/dev/null && source <(ng completion script)
+
+# PVIM Configuration
+export PATH="$HOME/.local/bin:$PATH"
+alias pvim='NVIM_APPNAME=pvim nvim'
+alias pvi='NVIM_APPNAME=pvim nvim'
+# END PVIM
+
+# === Auto-install ZSH plugins ===
+# zsh-autosuggestions (ghost text suggestions as you type)
+znap source zsh-users/zsh-autosuggestions
+
+# zsh-syntax-highlighting (colors for valid/invalid commands)
+znap source zsh-users/zsh-syntax-highlighting

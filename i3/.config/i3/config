@@ -40,6 +40,17 @@ bindsym $mod+b exec firefox
 bindsym $mod+p exec dmenu_run
 bindsym $mod+f fullscreen toggle
 
+# Launch tmux sessions
+bindsym $mod+Shift+w exec kitty -e ~/.config/i3/work-tmux-session.sh
+bindsym $mod+Shift+t exec kitty -e ~/.config/i3/scalestash-tmux-session.sh
+
+# Floating window toggle keybindings (right-hand keys)
+bindsym $mod+Shift+u exec ~/.config/i3/toggle-slack.sh
+bindsym $mod+Shift+i exec ~/.config/i3/toggle-spotify.sh
+bindsym $mod+Shift+o exec ~/.config/i3/toggle-obsidian.sh
+bindsym $mod+Shift+p exec ~/.config/i3/toggle-terminal.sh
+bindsym $mod+Shift+semicolon exec ~/.config/i3/toggle-btop.sh
+
 bindsym $mod+h focus left
 bindsym $mod+j focus down
 bindsym $mod+k focus up
@@ -82,17 +93,16 @@ bindsym $mod+space focus mode_toggle
 
 # Launch flameshot GUI to select area
 bindsym $mod+Shift+s exec --no-startup-id flameshot gui
-# Take fullscreen screenshot, save to ~/Pictures with timestamp
 bindsym $mod+Shift+f exec --no-startup-id flameshot full -p ~/Pictures
 bindsym $mod+Shift+c exec --no-startup-id flameshot gui -c
 
 
 
-set $ws1 "1"
-set $ws2 "2"
-set $ws3 "3"
-set $ws4 "4"
-set $ws5 "5"
+set $ws1 "1:browser"
+set $ws2 "2:work"
+set $ws3 "3:dev"
+set $ws4 "4:slack"
+set $ws5 "5:scalestash"
 set $ws6 "6"
 set $ws7 "7"
 set $ws8 "8"
@@ -125,15 +135,12 @@ bindsym $mod+Shift+0 move container to workspace number $ws10
 
 # Executables to autostart
 
-# Needed defaults
 exec --no-startup-id nm-applet
-exec --no-startup-id volumeicon      
+exec --no-startup-id volumeicon
 exec --no-startup-id blueman-applet
-exec_always --no-startup-id ~/.config/polybar/launch.sh
 
 exec --no-startup-id xinput list --name-only | grep -i touchpad | xargs -I {} xinput set-prop "{}" "libinput Natural Scrolling Enabled" 1
 
-#  wallpaper
 exec_always --no-startup-id sh -c 'feh --bg-fill "$HOME/Pictures/wallpapers/an.jpg"'
 
 
@@ -147,8 +154,16 @@ exec --no-startup-id i3-msg "workspace $ws4"
 # privacy red light
 exec --no-startup-id redshift -l auto
 
-# Launch Slack on workspace 4
-# add slack to workspace 4
+# Launch Firefox browser on workspace 1
+exec --no-startup-id i3-msg "workspace 1; exec firefox"
+
+# Launch tmux session on work workspace
+exec --no-startup-id i3-msg "workspace $ws2; exec kitty -e ~/.config/i3/work-tmux-session.sh"
+
+# Launch tmux session on scalestash workspace
+exec --no-startup-id i3-msg "workspace $ws5; exec kitty -e ~/.config/i3/scalestash-tmux-session.sh"
+
+# Launch Slack on workspace 3
 exec --no-startup-id i3-msg "workspace $ws4; exec slack"
 
 bar {
@@ -157,6 +172,13 @@ bar {
     font pango:JetBrainsMono Nerd Font 12
 }
 
+
+# Floating window configurations
+for_window [class="Slack"] floating enable, resize set 1600 1000, move position center
+for_window [class="Spotify"] floating enable, resize set 1600 1000, move position center
+for_window [class="Obsidian"] floating enable, resize set 1600 1000, move position center
+for_window [instance="floating-terminal"] floating enable, resize set 1400 800, move position center
+for_window [class="Btop"] floating enable, resize set 1400 900, move position center
 
 for_window [class=".*"] border pixel 2
 for_window [floating] resize set 1200 800, move position center
