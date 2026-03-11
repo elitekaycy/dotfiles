@@ -5,13 +5,14 @@
 lock="  Lock"
 logout="󰍃  Logout"
 suspend="󰤄  Suspend"
+hibernate="󰒲  Hibernate"
 reboot="  Reboot"
 shutdown="  Shutdown"
 
 # Show rofi menu
-chosen=$(echo -e "$lock\n$logout\n$suspend\n$reboot\n$shutdown" | rofi -dmenu -i -p "Power" -theme-str '
+chosen=$(echo -e "$lock\n$logout\n$suspend\n$hibernate\n$reboot\n$shutdown" | rofi -dmenu -i -p "Power" -theme-str '
 window { width: 200px; }
-listview { lines: 5; }
+listview { lines: 6; }
 ')
 
 # Confirm for destructive actions
@@ -34,6 +35,9 @@ case "$chosen" in
         ;;
     "$suspend")
         i3lock -c 1a1b26 && systemctl suspend
+        ;;
+    "$hibernate")
+        i3lock -c 1a1b26 && systemctl hibernate
         ;;
     "$reboot")
         confirm_action "reboot" && systemctl reboot
