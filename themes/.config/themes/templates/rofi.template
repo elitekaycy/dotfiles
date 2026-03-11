@@ -29,7 +29,7 @@ configuration {
 }
 
 window {
-    width: 650px;
+    width: 800px;
     background-color: @bg;
     border: 2px;
     border-color: @blue;
