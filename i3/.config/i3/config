@@ -47,6 +47,11 @@ bindsym $mod+t exec ~/.config/themes/scripts/rofi-theme-picker.sh
 # Wallpaper picker
 bindsym $mod+Shift+b exec ~/.config/polybar/scripts/rofi-wallpaper.sh
 
+# Media launchers
+bindsym $mod+m exec kitty -e ncspot
+bindsym $mod+Shift+a exec kitty -e ani-cli
+bindsym $mod+Shift+v exec kitty -e lobster
+
 # Key bindings
 bindsym $mod+Return exec kitty
 bindsym $mod+d exec rofi -show drun
