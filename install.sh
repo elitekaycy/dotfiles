@@ -1,505 +1,56 @@
 #!/usr/bin/env bash
 set -e
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+INSTALL_DIR="$SCRIPT_DIR/install"
 
-log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
-log_success() { echo -e "${GREEN}[OK]${NC} $1"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+# Source utilities
+source "$INSTALL_DIR/utils.sh"
 
-DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Source all modules
+source "$INSTALL_DIR/core.sh"
+source "$INSTALL_DIR/i3.sh"
+source "$INSTALL_DIR/terminal.sh"
+source "$INSTALL_DIR/neovim.sh"
+source "$INSTALL_DIR/devtools.sh"
+source "$INSTALL_DIR/fonts.sh"
+source "$INSTALL_DIR/greenclip.sh"
+source "$INSTALL_DIR/rust.sh"
+source "$INSTALL_DIR/zsh.sh"
+source "$INSTALL_DIR/slack.sh"
+source "$INSTALL_DIR/setup.sh"
 
 # Ensure submodules are initialized (for pvim)
-if [[ -f "$DOTFILES_DIR/.gitmodules" ]]; then
-    git -C "$DOTFILES_DIR" submodule update --init --recursive 2>/dev/null || true
-fi
-
-# Detect OS
-detect_os() {
-    if [[ -f /etc/os-release ]]; then
-        . /etc/os-release
-        case "$ID" in
-            ubuntu|debian|pop|linuxmint) echo "debian" ;;
-            fedora) echo "fedora" ;;
-            arch|manjaro|endeavouros) echo "arch" ;;
-            *) echo "unknown" ;;
-        esac
-    else
-        echo "unknown"
+init_submodules() {
+    if [[ -f "$SCRIPT_DIR/.gitmodules" ]]; then
+        log_info "Initializing git submodules..."
+        git -C "$SCRIPT_DIR" submodule update --init --recursive 2>/dev/null || true
     fi
 }
 
-OS=$(detect_os)
-
-# Package manager helpers
-pkg_install() {
-    case "$OS" in
-        debian) sudo apt-get install -y "$@" ;;
-        fedora) sudo dnf install -y "$@" ;;
-        arch) sudo pacman -S --noconfirm "$@" ;;
-    esac
+show_help() {
+    echo "Usage: ./install.sh [component]"
+    echo ""
+    echo "Components:"
+    echo "  (none)     Install everything"
+    echo "  core       Core packages (git, stow, curl, etc.)"
+    echo "  i3         i3 window manager and tools"
+    echo "  terminal   Kitty, tmux, zsh"
+    echo "  neovim     Neovim (latest via AppImage on Debian/Ubuntu)"
+    echo "  devtools   bat, fd, fzf, eza, ripgrep, btop"
+    echo "  fonts      JetBrains Mono Nerd Font"
+    echo "  greenclip  Clipboard manager"
+    echo "  rust       Rust toolchain"
+    echo "  zsh        Oh My Zsh, asdf, atuin"
+    echo "  stow       Symlink dotfiles only"
+    echo "  setup      Run all setup (stow, themes, tmux, pvim)"
+    echo "  pvim       Setup pvim (neovim config)"
+    echo "  themes     Apply default theme"
+    echo "  slack      Install Slack as web app"
+    echo "  wallpapers Copy wallpapers"
+    echo ""
 }
 
-pkg_update() {
-    case "$OS" in
-        debian) sudo apt-get update ;;
-        fedora) sudo dnf check-update || true ;;
-        arch) sudo pacman -Sy ;;
-    esac
-}
-
-# Check if command exists
-has() { command -v "$1" &>/dev/null; }
-
-# ============================================================
-# CORE PACKAGES
-# ============================================================
-install_core() {
-    log_info "Installing core packages..."
-
-    case "$OS" in
-        debian)
-            pkg_install git curl wget stow build-essential unzip xclip
-            ;;
-        fedora)
-            pkg_install git curl wget stow gcc make unzip xclip
-            ;;
-        arch)
-            pkg_install git curl wget stow base-devel unzip xclip
-            ;;
-    esac
-
-    log_success "Core packages installed"
-}
-
-# ============================================================
-# I3 WINDOW MANAGER
-# ============================================================
-install_i3() {
-    log_info "Installing i3 and related packages..."
-
-    case "$OS" in
-        debian)
-            pkg_install \
-                i3 \
-                i3lock \
-                rofi \
-                dmenu \
-                feh \
-                brightnessctl \
-                network-manager-gnome \
-                blueman \
-                xinput \
-                acpi \
-                alsa-utils \
-                pulseaudio-utils \
-                pavucontrol \
-                lm-sensors \
-                redshift \
-                flameshot \
-                picom \
-                dunst \
-                playerctl \
-                xss-lock \
-                polybar
-            ;;
-        fedora)
-            pkg_install \
-                i3 \
-                i3lock \
-                rofi \
-                dmenu \
-                feh \
-                brightnessctl \
-                network-manager-applet \
-                blueman \
-                xinput \
-                acpi \
-                alsa-utils \
-                pulseaudio-utils \
-                pavucontrol \
-                lm_sensors \
-                redshift \
-                flameshot \
-                picom \
-                dunst \
-                playerctl \
-                xss-lock \
-                polybar
-            ;;
-        arch)
-            pkg_install \
-                i3-wm \
-                i3lock \
-                rofi \
-                dmenu \
-                feh \
-                brightnessctl \
-                network-manager-applet \
-                blueman \
-                xorg-xinput \
-                acpi \
-                alsa-utils \
-                pulseaudio \
-                pavucontrol \
-                lm_sensors \
-                redshift \
-                flameshot \
-                picom \
-                dunst \
-                playerctl \
-                xss-lock \
-                polybar
-            ;;
-    esac
-
-    log_success "i3 packages installed"
-}
-
-# ============================================================
-# GREENCLIP (Clipboard Manager)
-# ============================================================
-install_greenclip() {
-    if has greenclip; then
-        log_success "Greenclip already installed"
-        return
-    fi
-
-    log_info "Installing Greenclip..."
-
-    local greenclip_url="https://github.com/erebe/greenclip/releases/download/v4.2/greenclip"
-    mkdir -p "$HOME/.local/bin"
-    curl -Lo "$HOME/.local/bin/greenclip" "$greenclip_url"
-    chmod +x "$HOME/.local/bin/greenclip"
-
-    # Create config directory
-    mkdir -p "$HOME/.config/greenclip"
-
-    log_success "Greenclip installed"
-}
-
-# ============================================================
-# TERMINAL (Kitty + Tmux + Zsh)
-# ============================================================
-install_terminal() {
-    log_info "Installing terminal packages..."
-
-    case "$OS" in
-        debian) pkg_install kitty tmux zsh ;;
-        fedora) pkg_install kitty tmux zsh ;;
-        arch) pkg_install kitty tmux zsh ;;
-    esac
-
-    log_success "Terminal packages installed"
-}
-
-# ============================================================
-# NEOVIM
-# ============================================================
-install_neovim() {
-    log_info "Installing Neovim..."
-
-    case "$OS" in
-        debian)
-            # Ubuntu/Debian repos have old nvim, use PPA or AppImage
-            if ! has nvim || [[ $(nvim --version | head -1 | grep -oP '\d+\.\d+' | head -1) < "0.9" ]]; then
-                log_info "Installing latest Neovim via AppImage..."
-                curl -Lo /tmp/nvim.appimage "https://github.com/neovim/neovim/releases/latest/download/nvim.appimage"
-                chmod +x /tmp/nvim.appimage
-                sudo mv /tmp/nvim.appimage /usr/local/bin/nvim
-            fi
-            ;;
-        fedora)
-            pkg_install neovim
-            ;;
-        arch)
-            pkg_install neovim
-            ;;
-    esac
-
-    log_success "Neovim installed"
-}
-
-# ============================================================
-# DEV TOOLS (bat, fd, fzf, eza, ripgrep, btop)
-# ============================================================
-install_devtools() {
-    log_info "Installing development tools..."
-
-    case "$OS" in
-        debian)
-            pkg_install bat fd-find fzf ripgrep btop
-            # eza needs special install on debian
-            if ! has eza; then
-                sudo mkdir -p /etc/apt/keyrings
-                wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-                echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
-                sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
-                sudo apt-get update
-                pkg_install eza
-            fi
-            ;;
-        fedora)
-            pkg_install bat fd-find fzf ripgrep eza btop
-            ;;
-        arch)
-            pkg_install bat fd fzf ripgrep eza btop
-            ;;
-    esac
-
-    log_success "Development tools installed"
-}
-
-# ============================================================
-# RUST / CARGO
-# ============================================================
-install_rust() {
-    if has rustc; then
-        log_success "Rust already installed"
-        return
-    fi
-
-    log_info "Installing Rust..."
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    source "$HOME/.cargo/env"
-    log_success "Rust installed"
-}
-
-# ============================================================
-# OH MY ZSH
-# ============================================================
-install_ohmyzsh() {
-    if [[ -d "$HOME/.oh-my-zsh" ]]; then
-        log_success "Oh My Zsh already installed"
-        return
-    fi
-
-    log_info "Installing Oh My Zsh..."
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-    log_success "Oh My Zsh installed"
-}
-
-# ============================================================
-# ASDF VERSION MANAGER
-# ============================================================
-install_asdf() {
-    if [[ -d "$HOME/.asdf" ]]; then
-        log_success "asdf already installed"
-        return
-    fi
-
-    log_info "Installing asdf..."
-    git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
-    log_success "asdf installed"
-}
-
-# ============================================================
-# ATUIN (Shell History)
-# ============================================================
-install_atuin() {
-    if has atuin; then
-        log_success "Atuin already installed"
-        return
-    fi
-
-    log_info "Installing Atuin..."
-    curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
-    log_success "Atuin installed"
-}
-
-# ============================================================
-# NERD FONTS
-# ============================================================
-install_fonts() {
-    local font_dir="$HOME/.local/share/fonts"
-
-    if fc-list | grep -qi "JetBrains"; then
-        log_success "JetBrains Mono Nerd Font already installed"
-        return
-    fi
-
-    log_info "Installing JetBrains Mono Nerd Font..."
-    mkdir -p "$font_dir"
-
-    local version="v3.1.1"
-    curl -Lo /tmp/JetBrainsMono.zip "https://github.com/ryanoasis/nerd-fonts/releases/download/${version}/JetBrainsMono.zip"
-    unzip -o /tmp/JetBrainsMono.zip -d "$font_dir"
-    rm /tmp/JetBrainsMono.zip
-
-    fc-cache -fv
-    log_success "Fonts installed"
-}
-
-# ============================================================
-# SLACK (Web App - replaces desktop app)
-# ============================================================
-install_slack() {
-    log_info "Installing Slack as a web app..."
-
-    # Remove snap version if exists
-    if snap list slack &>/dev/null; then
-        log_info "Removing Slack snap..."
-        sudo snap remove slack
-    fi
-
-    # Remove deb version if exists
-    if dpkg -l | grep -q slack-desktop; then
-        log_info "Removing Slack desktop..."
-        sudo apt remove -y slack-desktop
-    fi
-
-    # Create webapp directories
-    mkdir -p ~/.local/share/webapps/slack-chrome-profile
-    mkdir -p ~/.local/share/applications
-
-    # Create desktop entry
-    cat > ~/.local/share/applications/slack-webapp.desktop << 'SLACKEOF'
-[Desktop Entry]
-Version=1.0
-Name=Slack
-Comment=Slack Web App
-Exec=google-chrome --app=https://app.slack.com --class=SlackWebApp --user-data-dir=~/.local/share/webapps/slack-chrome-profile --no-first-run --disable-infobars --disable-session-crashed-bubble
-Icon=slack
-Terminal=false
-Type=Application
-Categories=Network;InstantMessaging;
-StartupWMClass=SlackWebApp
-SLACKEOF
-
-    log_success "Slack web app installed"
-    log_info "Launch with: rofi/dmenu -> 'Slack'"
-}
-
-# ============================================================
-# STOW DOTFILES
-# ============================================================
-stow_dotfiles() {
-    log_info "Stowing dotfiles..."
-
-    cd "$DOTFILES_DIR"
-
-    # List of directories to stow
-    local configs=(bash zsh i3 kitty tmux nvim pvim rofi dunst picom polybar themes)
-
-    for config in "${configs[@]}"; do
-        if [[ -d "$config" ]]; then
-            log_info "  Stowing $config..."
-            stow -R "$config" 2>/dev/null || stow "$config"
-        fi
-    done
-
-    log_success "Dotfiles stowed"
-}
-
-# ============================================================
-# WALLPAPERS
-# ============================================================
-setup_wallpapers() {
-    log_info "Setting up wallpapers..."
-
-    mkdir -p "$HOME/Pictures/wallpapers"
-
-    if [[ -d "$DOTFILES_DIR/wallpapers" ]]; then
-        cp -r "$DOTFILES_DIR/wallpapers/"* "$HOME/Pictures/wallpapers/" 2>/dev/null || true
-        log_success "Wallpapers copied to ~/Pictures/wallpapers/"
-    else
-        log_warn "No wallpapers directory found in dotfiles"
-    fi
-}
-
-# ============================================================
-# MAKE SCRIPTS EXECUTABLE
-# ============================================================
-make_executable() {
-    log_info "Making scripts executable..."
-
-    chmod +x "$DOTFILES_DIR"/i3/.config/i3/*.sh 2>/dev/null || true
-    chmod +x "$HOME"/.config/i3/*.sh 2>/dev/null || true
-    chmod +x "$DOTFILES_DIR"/polybar/.config/polybar/*.sh 2>/dev/null || true
-    chmod +x "$DOTFILES_DIR"/polybar/.config/polybar/scripts/*.sh 2>/dev/null || true
-    chmod +x "$HOME"/.config/polybar/*.sh 2>/dev/null || true
-    chmod +x "$HOME"/.config/polybar/scripts/*.sh 2>/dev/null || true
-    chmod +x "$DOTFILES_DIR"/themes/.config/themes/scripts/*.sh 2>/dev/null || true
-    chmod +x "$HOME"/.config/themes/scripts/*.sh 2>/dev/null || true
-
-    log_success "Scripts are executable"
-}
-
-# ============================================================
-# THEME SETUP (Apply default theme)
-# ============================================================
-setup_themes() {
-    log_info "Setting up theme switcher..."
-
-    local apply_script="$HOME/.config/themes/scripts/apply-theme.sh"
-
-    if [[ -f "$apply_script" ]]; then
-        log_info "Applying default theme (tokyo-night)..."
-        bash "$apply_script" tokyo-night || true
-        log_success "Default theme applied"
-    else
-        log_warn "Theme apply script not found, skipping"
-    fi
-}
-
-# ============================================================
-# TMUX PLUGINS
-# ============================================================
-setup_tmux() {
-    local tpm_dir="$HOME/.tmux/plugins/tpm"
-
-    if [[ -d "$tpm_dir" ]]; then
-        log_success "TPM already installed"
-    else
-        log_info "Installing Tmux Plugin Manager..."
-        git clone https://github.com/tmux-plugins/tpm "$tpm_dir"
-        log_success "TPM installed"
-    fi
-
-    # Install plugins
-    if [[ -f "$tpm_dir/bin/install_plugins" ]]; then
-        log_info "Installing tmux plugins..."
-        "$tpm_dir/bin/install_plugins" || true
-    fi
-}
-
-# ============================================================
-# PVIM (Neovim Config)
-# ============================================================
-setup_pvim() {
-    local pvim_install="$DOTFILES_DIR/pvim/.config/pvim/install.sh"
-
-    if [[ -f "$pvim_install" ]]; then
-        log_info "Running pvim installer..."
-        bash "$pvim_install"
-    else
-        log_warn "pvim install.sh not found, skipping"
-    fi
-}
-
-# ============================================================
-# CHANGE DEFAULT SHELL
-# ============================================================
-set_zsh_default() {
-    if [[ "$SHELL" == *"zsh"* ]]; then
-        log_success "Zsh is already default shell"
-        return
-    fi
-
-    log_info "Setting zsh as default shell..."
-    chsh -s "$(which zsh)"
-    log_success "Zsh set as default (restart terminal to apply)"
-}
-
-# ============================================================
-# MAIN
-# ============================================================
 main() {
     echo ""
     echo -e "${BLUE}╔═══════════════════════════════════════╗${NC}"
@@ -508,19 +59,19 @@ main() {
     echo ""
 
     if [[ "$OS" == "unknown" ]]; then
-        log_error "Unsupported OS. This script supports Debian/Ubuntu, Fedora, and Arch Linux."
+        log_error "Unsupported OS. Supports: Debian/Ubuntu, Fedora, Arch Linux."
         exit 1
     fi
 
     log_info "Detected OS: $OS"
     echo ""
 
-    # Update package manager
-    log_info "Updating package manager..."
+    # Initialize
+    init_submodules
     pkg_update
     echo ""
 
-    # Install everything
+    # Install packages
     install_core
     install_i3
     install_greenclip
@@ -528,15 +79,14 @@ main() {
     install_neovim
     install_devtools
     install_rust
-    install_ohmyzsh
-    install_asdf
-    install_atuin
+    install_zsh_ecosystem
     install_fonts
 
     echo ""
     log_info "Setting up configurations..."
     echo ""
 
+    # Setup
     stow_dotfiles
     setup_wallpapers
     make_executable
@@ -550,52 +100,64 @@ main() {
     echo -e "${GREEN}║       INSTALLATION COMPLETE!          ║${NC}"
     echo -e "${GREEN}╚═══════════════════════════════════════╝${NC}"
     echo ""
-    echo -e "Next steps:"
-    echo -e "  1. Log out and log back in (or restart)"
-    echo -e "  2. Select i3 as your window manager at login"
-    echo -e "  3. Open a terminal and enjoy!"
-    echo ""
-    echo -e "Optional: Install productivity apps:"
-    echo -e "  - Slack: ${YELLOW}./install.sh slack${NC} (web app)"
-    echo -e "  - Spotify: ${YELLOW}snap install spotify${NC}"
-    echo -e "  - Obsidian: ${YELLOW}snap install obsidian${NC}"
+    echo "Next steps:"
+    echo "  1. Log out and log back in (or restart)"
+    echo "  2. Select i3 as your window manager at login"
+    echo "  3. Open a terminal and enjoy!"
     echo ""
 }
 
-# Run with optional component selection
-if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-    echo "Usage: ./install.sh [component]"
-    echo ""
-    echo "Components:"
-    echo "  (none)     Install everything"
-    echo "  core       Core packages only (git, stow, etc.)"
-    echo "  i3         i3 window manager and tools"
-    echo "  terminal   Kitty, tmux, zsh"
-    echo "  neovim     Neovim (latest via AppImage on Debian/Ubuntu)"
-    echo "  devtools   bat, fd, fzf, eza, ripgrep, btop"
-    echo "  fonts      JetBrains Mono Nerd Font"
-    echo "  stow       Symlink dotfiles only"
-    echo "  pvim       Setup pvim (neovim config)"
-    echo "  slack      Install Slack as web app (removes desktop app)"
-    echo "  wallpapers Copy wallpapers to ~/Pictures/wallpapers"
-    echo "  greenclip  Install clipboard manager"
-    echo "  themes     Setup theme switcher and apply default theme"
-    echo ""
-    exit 0
-fi
-
+# Handle arguments
 case "$1" in
-    core) pkg_update && install_core ;;
-    i3) pkg_update && install_i3 ;;
-    terminal) pkg_update && install_terminal ;;
-    neovim) install_neovim ;;
-    devtools) pkg_update && install_devtools ;;
-    fonts) install_fonts ;;
-    stow) stow_dotfiles && make_executable ;;
-    pvim) setup_pvim ;;
-    slack) install_slack ;;
-    wallpapers) setup_wallpapers ;;
-    greenclip) install_greenclip ;;
-    themes) setup_themes ;;
-    *) main ;;
+    -h|--help)
+        show_help
+        ;;
+    core)
+        pkg_update && install_core
+        ;;
+    i3)
+        pkg_update && install_i3
+        ;;
+    terminal)
+        pkg_update && install_terminal
+        ;;
+    neovim)
+        install_neovim
+        ;;
+    devtools)
+        pkg_update && install_devtools
+        ;;
+    fonts)
+        install_fonts
+        ;;
+    greenclip)
+        install_greenclip
+        ;;
+    rust)
+        install_rust
+        ;;
+    zsh)
+        install_zsh_ecosystem
+        ;;
+    stow)
+        stow_dotfiles && make_executable
+        ;;
+    setup)
+        run_setup
+        ;;
+    pvim)
+        setup_pvim
+        ;;
+    themes)
+        setup_themes
+        ;;
+    slack)
+        install_slack
+        ;;
+    wallpapers)
+        setup_wallpapers
+        ;;
+    *)
+        main
+        ;;
 esac
