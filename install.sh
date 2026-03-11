@@ -91,18 +91,19 @@ main() {
     # Zsh ecosystem (installs mise)
     install_zsh_ecosystem
 
-    # Everything else via mise
-    install_devtools
-    install_languages
-
+    # Stow dotfiles first so mise config.toml is in place
     echo ""
     log_info "Setting up configurations..."
     echo ""
-
-    # Setup
     stow_dotfiles
-    setup_wallpapers
     make_executable
+
+    # Everything via mise (needs config.toml stowed first)
+    install_devtools
+    install_languages
+
+    # Remaining setup
+    setup_wallpapers
     setup_themes
     setup_tmux
     setup_pvim

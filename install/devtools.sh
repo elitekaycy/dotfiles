@@ -5,6 +5,9 @@
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
 install_devtools() {
+    # Ensure mise is on PATH (fresh install may not have it yet)
+    export PATH="$HOME/.local/bin:$PATH"
+
     if ! has mise; then
         log_error "mise not installed. Run ./install.sh zsh first."
         return 1

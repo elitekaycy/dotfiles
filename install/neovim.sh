@@ -5,6 +5,9 @@
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
 install_neovim() {
+    # Ensure mise is on PATH (fresh install may not have it yet)
+    export PATH="$HOME/.local/bin:$PATH"
+
     if has nvim; then
         log_success "Neovim already installed ($(nvim --version | head -1))"
         return
