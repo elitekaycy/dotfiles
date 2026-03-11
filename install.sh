@@ -335,6 +335,22 @@ stow_dotfiles() {
 }
 
 # ============================================================
+# WALLPAPERS
+# ============================================================
+setup_wallpapers() {
+    log_info "Setting up wallpapers..."
+
+    mkdir -p "$HOME/Pictures/wallpapers"
+
+    if [[ -d "$DOTFILES_DIR/wallpapers" ]]; then
+        cp -r "$DOTFILES_DIR/wallpapers/"* "$HOME/Pictures/wallpapers/" 2>/dev/null || true
+        log_success "Wallpapers copied to ~/Pictures/wallpapers/"
+    else
+        log_warn "No wallpapers directory found in dotfiles"
+    fi
+}
+
+# ============================================================
 # MAKE SCRIPTS EXECUTABLE
 # ============================================================
 make_executable() {
@@ -434,6 +450,7 @@ main() {
     echo ""
 
     stow_dotfiles
+    setup_wallpapers
     make_executable
     setup_tmux
     setup_pvim
@@ -470,6 +487,7 @@ if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     echo "  stow       Symlink dotfiles only"
     echo "  pvim       Setup pvim (neovim config)"
     echo "  slack      Install Slack as web app (removes desktop app)"
+    echo "  wallpapers Copy wallpapers to ~/Pictures/wallpapers"
     echo ""
     exit 0
 fi
@@ -483,5 +501,6 @@ case "$1" in
     stow) stow_dotfiles && make_executable ;;
     pvim) setup_pvim ;;
     slack) install_slack ;;
+    wallpapers) setup_wallpapers ;;
     *) main ;;
 esac

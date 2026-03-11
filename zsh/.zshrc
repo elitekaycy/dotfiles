@@ -137,17 +137,26 @@ command -v bat &>/dev/null && alias cat="bat"
 
 
 # TMUX SESSION EXIST OR CREATE
-
-# Check if tmux is already running
 if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-    # Check if there is any existing tmux session
-    if tmux ls &> /dev/null; then
-        # Attach to the first available tmux session
-        tmux attach-session -t 0
+    session_count=$(tmux ls 2>/dev/null | wc -l)
+
+    if [[ $session_count -eq 0 ]]; then
+        # No sessions - create "main"
+        tmux new-session -s main
+    elif [[ $session_count -eq 1 ]]; then
+        # One session - attach to it
+        tmux attach-session
     else
-        # Start a new tmux session
-        tmux new-session
-   fi
+        # Multiple sessions - pick with fzf or fallback to last
+        if command -v fzf &> /dev/null; then
+            session=$(tmux ls -F "#{session_name}: #{session_windows} windows (#{session_attached} attached)" | \
+                fzf --height=40% --reverse --header="Select tmux session" | \
+                cut -d: -f1)
+            [[ -n "$session" ]] && tmux attach-session -t "$session" || tmux attach-session
+        else
+            tmux attach-session
+        fi
+    fi
 fi
 
 
@@ -268,6 +277,12 @@ alias sss="sudo shutdown now"
 # Restart aliases
 alias reboot="sudo reboot"
 alias rr="sudo reboot"
+
+# Tmux aliases
+alias tn='tmux new-session -s'       # tn work -> new session named "work"
+alias ta='tmux attach-session -t'    # ta work -> attach to "work"
+alias tl='tmux ls'                   # list sessions
+alias tk='tmux kill-session -t'      # tk work -> kill "work"
 
 # Load Angular CLI autocompletion (if installed)
 command -v ng &>/dev/null && source <(ng completion script)

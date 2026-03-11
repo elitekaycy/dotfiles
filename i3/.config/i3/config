@@ -91,16 +91,17 @@ bindsym $mod+Shift+c exec --no-startup-id flameshot gui -c
 
 
 
-set $ws1 "1:browser"
-set $ws2 "2:work"
-set $ws3 "3:dev"
-set $ws4 "4:slack"
-set $ws5 "5:scalestash"
-set $ws6 "6"
-set $ws7 "7"
-set $ws8 "8"
-set $ws9 "9"
-set $ws10 "10"
+# Workspaces with icons
+set $ws1 "1:  browser"
+set $ws2 "2:  work"
+set $ws3 "3:  dev"
+set $ws4 "4:  slack"
+set $ws5 "5:  scale"
+set $ws6 "6:  misc"
+set $ws7 "7: 󰎈 media"
+set $ws8 "8:  docs"
+set $ws9 "9:  term"
+set $ws10 "10:  config"
 
 
 # Switch to workspace
@@ -159,18 +160,43 @@ exec --no-startup-id i3-msg "workspace $ws5; exec kitty -e ~/.config/i3/scalesta
 # Launch Slack on workspace 4
 exec --no-startup-id i3-msg "workspace $ws4; exec google-chrome --app=https://app.slack.com --class=SlackWebApp --user-data-dir=~/.local/share/webapps/slack-chrome-profile --no-first-run --disable-infobars --disable-session-crashed-bubble"
 
+# Tokyo Night colors
+set $bg         #1a1b26
+set $fg         #c0caf5
+set $black      #15161e
+set $red        #f7768e
+set $green      #9ece6a
+set $yellow     #e0af68
+set $blue       #7aa2f7
+set $magenta    #bb9af7
+set $cyan       #7dcfff
+set $white      #a9b1d6
+
 bar {
     status_command i3blocks -c ~/.config/i3/i3blocks.conf
     position top
-    font pango:JetBrainsMono Nerd Font 12
+    font pango:JetBrainsMono Nerd Font 11
+    height 28
+    separator_symbol "  "
+    strip_workspace_numbers yes
+    workspace_min_width 40
+    colors {
+        background $bg
+        statusline $fg
+        separator  $black
+        #                  border   bg       text
+        focused_workspace  $blue    $blue    $bg
+        active_workspace   $bg      $bg      $fg
+        inactive_workspace $bg      $bg      $white
+        urgent_workspace   $red     $red     $bg
+    }
 }
 
+for_window [class=".*"] border pixel 1
 
-for_window [class=".*"] border pixel 2
-
-
-client.focused          #00FF00 #00FF00 #00FF00 #00FF00 #00FF00
-client.unfocused        #222222 #222222 #222222 #222222 #222222
-client.focused_inactive #444444 #444444 #444444 #444444 #444444
-client.urgent           #FF0000 #FF0000 #FF0000 #FF0000 #FF0000
+#                       border   bg       text     indicator child_border
+client.focused          $blue    $blue    $bg      $cyan     $blue
+client.unfocused        $bg      $bg      $white   $bg       $bg
+client.focused_inactive $black   $black   $white   $black    $black
+client.urgent           $red     $red     $bg      $red      $red
 
