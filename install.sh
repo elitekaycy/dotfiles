@@ -15,6 +15,11 @@ log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Ensure submodules are initialized (for pvim)
+if [[ -f "$DOTFILES_DIR/.gitmodules" ]]; then
+    git -C "$DOTFILES_DIR" submodule update --init --recursive 2>/dev/null || true
+fi
+
 # Detect OS
 detect_os() {
     if [[ -f /etc/os-release ]]; then
@@ -60,13 +65,13 @@ install_core() {
 
     case "$OS" in
         debian)
-            pkg_install git curl wget stow build-essential
+            pkg_install git curl wget stow build-essential unzip xclip
             ;;
         fedora)
-            pkg_install git curl wget stow gcc make
+            pkg_install git curl wget stow gcc make unzip xclip
             ;;
         arch)
-            pkg_install git curl wget stow base-devel
+            pkg_install git curl wget stow base-devel unzip xclip
             ;;
     esac
 
@@ -192,6 +197,33 @@ install_terminal() {
     esac
 
     log_success "Terminal packages installed"
+}
+
+# ============================================================
+# NEOVIM
+# ============================================================
+install_neovim() {
+    log_info "Installing Neovim..."
+
+    case "$OS" in
+        debian)
+            # Ubuntu/Debian repos have old nvim, use PPA or AppImage
+            if ! has nvim || [[ $(nvim --version | head -1 | grep -oP '\d+\.\d+' | head -1) < "0.9" ]]; then
+                log_info "Installing latest Neovim via AppImage..."
+                curl -Lo /tmp/nvim.appimage "https://github.com/neovim/neovim/releases/latest/download/nvim.appimage"
+                chmod +x /tmp/nvim.appimage
+                sudo mv /tmp/nvim.appimage /usr/local/bin/nvim
+            fi
+            ;;
+        fedora)
+            pkg_install neovim
+            ;;
+        arch)
+            pkg_install neovim
+            ;;
+    esac
+
+    log_success "Neovim installed"
 }
 
 # ============================================================
@@ -493,6 +525,7 @@ main() {
     install_i3
     install_greenclip
     install_terminal
+    install_neovim
     install_devtools
     install_rust
     install_ohmyzsh
@@ -538,6 +571,7 @@ if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     echo "  core       Core packages only (git, stow, etc.)"
     echo "  i3         i3 window manager and tools"
     echo "  terminal   Kitty, tmux, zsh"
+    echo "  neovim     Neovim (latest via AppImage on Debian/Ubuntu)"
     echo "  devtools   bat, fd, fzf, eza, ripgrep, btop"
     echo "  fonts      JetBrains Mono Nerd Font"
     echo "  stow       Symlink dotfiles only"
@@ -554,6 +588,7 @@ case "$1" in
     core) pkg_update && install_core ;;
     i3) pkg_update && install_i3 ;;
     terminal) pkg_update && install_terminal ;;
+    neovim) install_neovim ;;
     devtools) pkg_update && install_devtools ;;
     fonts) install_fonts ;;
     stow) stow_dotfiles && make_executable ;;
