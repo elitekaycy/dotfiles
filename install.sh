@@ -99,7 +99,10 @@ install_i3() {
                 lm-sensors \
                 redshift \
                 flameshot \
-                picom
+                picom \
+                dunst \
+                playerctl \
+                xss-lock
             ;;
         fedora)
             pkg_install \
@@ -120,7 +123,10 @@ install_i3() {
                 lm_sensors \
                 redshift \
                 flameshot \
-                picom
+                picom \
+                dunst \
+                playerctl \
+                xss-lock
             ;;
         arch)
             pkg_install \
@@ -141,11 +147,36 @@ install_i3() {
                 lm_sensors \
                 redshift \
                 flameshot \
-                picom
+                picom \
+                dunst \
+                playerctl \
+                xss-lock
             ;;
     esac
 
     log_success "i3 packages installed"
+}
+
+# ============================================================
+# GREENCLIP (Clipboard Manager)
+# ============================================================
+install_greenclip() {
+    if has greenclip; then
+        log_success "Greenclip already installed"
+        return
+    fi
+
+    log_info "Installing Greenclip..."
+
+    local greenclip_url="https://github.com/erebe/greenclip/releases/download/v4.2/greenclip"
+    mkdir -p "$HOME/.local/bin"
+    curl -Lo "$HOME/.local/bin/greenclip" "$greenclip_url"
+    chmod +x "$HOME/.local/bin/greenclip"
+
+    # Create config directory
+    mkdir -p "$HOME/.config/greenclip"
+
+    log_success "Greenclip installed"
 }
 
 # ============================================================
@@ -322,7 +353,7 @@ stow_dotfiles() {
     cd "$DOTFILES_DIR"
 
     # List of directories to stow
-    local configs=(bash zsh i3 i3status kitty tmux nvim pvim rofi)
+    local configs=(bash zsh i3 i3status kitty tmux nvim pvim rofi dunst picom)
 
     for config in "${configs[@]}"; do
         if [[ -d "$config" ]]; then
@@ -437,6 +468,7 @@ main() {
     # Install everything
     install_core
     install_i3
+    install_greenclip
     install_terminal
     install_devtools
     install_rust
@@ -488,6 +520,7 @@ if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     echo "  pvim       Setup pvim (neovim config)"
     echo "  slack      Install Slack as web app (removes desktop app)"
     echo "  wallpapers Copy wallpapers to ~/Pictures/wallpapers"
+    echo "  greenclip  Install clipboard manager"
     echo ""
     exit 0
 fi
@@ -502,5 +535,6 @@ case "$1" in
     pvim) setup_pvim ;;
     slack) install_slack ;;
     wallpapers) setup_wallpapers ;;
+    greenclip) install_greenclip ;;
     *) main ;;
 esac

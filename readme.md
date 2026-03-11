@@ -26,7 +26,7 @@ If you prefer to install specific components:
 
 ```bash
 ./install.sh core       # git, stow, curl, etc.
-./install.sh i3         # i3wm, i3blocks, rofi, dmenu, feh, flameshot, etc.
+./install.sh i3         # i3wm, i3blocks, rofi, dmenu, feh, flameshot, dunst, etc.
 ./install.sh terminal   # kitty, tmux, zsh
 ./install.sh devtools   # bat, fd, fzf, eza, ripgrep, btop
 ./install.sh fonts      # JetBrains Mono Nerd Font
@@ -34,6 +34,7 @@ If you prefer to install specific components:
 ./install.sh pvim       # Setup neovim (pvim config)
 ./install.sh slack      # Slack as web app (replaces desktop app)
 ./install.sh wallpapers # Copy wallpapers to ~/Pictures/wallpapers
+./install.sh greenclip  # Clipboard manager
 ```
 
 ## What's Included
@@ -46,6 +47,8 @@ If you prefer to install specific components:
 | **zsh** | Shell with znap, pure prompt, autosuggestions, syntax highlighting |
 | **rofi** | App launcher with Tokyo Night theme |
 | **pvim** | Neovim config with LSP, treesitter, lazy.nvim |
+| **dunst** | Notification daemon with Tokyo Night theme |
+| **picom** | Compositor for transparency and no screen tearing |
 
 ---
 
@@ -108,6 +111,14 @@ If you prefer to install specific components:
 | `Mod+Shift+s` | Screenshot area (select) |
 | `Mod+Shift+f` | Screenshot fullscreen |
 | `Mod+Shift+c` | Screenshot to clipboard |
+
+#### System
+| Key | Action |
+|-----|--------|
+| `Mod+Escape` | Lock screen |
+| `Mod+v` | Clipboard history (rofi) |
+| `XF86AudioPlay` | Play/pause media |
+| `XF86AudioNext/Prev` | Next/previous track |
 
 ---
 
@@ -221,10 +232,11 @@ Uses vim-tmux-navigator for seamless pane switching:
 
 Auto-installed by `install.sh`:
 
-- **Window Manager:** i3, i3blocks, rofi, dmenu, feh, picom
+- **Window Manager:** i3, i3blocks, rofi, dmenu, feh, picom, dunst
 - **Terminal:** kitty, tmux, zsh
 - **Editor:** neovim
-- **Tools:** bat, fd, fzf, eza, ripgrep, btop, flameshot, redshift
+- **Tools:** bat, fd, fzf, eza, ripgrep, btop, flameshot, redshift, playerctl, greenclip
+- **Security:** i3lock, xss-lock
 - **Fonts:** JetBrains Mono Nerd Font
 
 ## Submodules
