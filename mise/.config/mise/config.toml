@@ -1,0 +1,20 @@
+[tools]
+# Languages
+node = ["22", "23"]
+java = ["21", "17"]
+python = "3.12"
+
+# Build tools
+maven = "3.9"
+gradle = "8"
+pnpm = "latest"
+
+# CLI tools
+eza = "latest"
+fd = "latest"
+delta = "latest"
+lazydocker = "latest"
+lazygit = "latest"
+
+[settings]
+experimental = true
