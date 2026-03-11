@@ -130,9 +130,14 @@ fi
 log_success "Polybar reloaded"
 
 # Reload kitty (if running with remote control)
-if command -v kitty &> /dev/null && [[ -S /tmp/mykitty ]]; then
-    kitty @ --to unix:/tmp/mykitty set-colors -a -c "$HOME/.config/kitty/theme.conf" 2>/dev/null || true
-    log_success "Kitty colors updated"
+if command -v kitty &> /dev/null; then
+    # Find kitty socket (may include PID suffix)
+    for sock in /tmp/mykitty*; do
+        if [[ -S "$sock" ]]; then
+            kitty @ --to "unix:$sock" set-colors -a -c "$HOME/.config/kitty/theme.conf" 2>/dev/null && \
+                log_success "Kitty colors updated (${sock##*/})"
+        fi
+    done
 fi
 
 # Reload dunst
@@ -148,6 +153,23 @@ if command -v i3-msg &> /dev/null; then
     log_success "i3 reloaded"
 fi
 
+# Reload neovim/pvim (if nvim instances are running with server)
+if command -v nvim &> /dev/null; then
+    nvim_updated=false
+    # Find pvim/nvim server sockets
+    for sock in /tmp/pvim-* /run/user/$(id -u)/nvim.*.0 /tmp/nvim*/0; do
+        if [[ -S "$sock" ]]; then
+            nvim --server "$sock" --remote-send "<Cmd>PvimThemeSet $NVIM_THEME<CR>" 2>/dev/null && {
+                log_success "Neovim theme updated (${sock##*/})"
+                nvim_updated=true
+            }
+        fi
+    done 2>/dev/null
+    if [[ "$nvim_updated" == "false" ]]; then
+        log_warn "No nvim servers found - restart nvim to apply theme"
+    fi
+fi
+
 # Save current theme ID
 echo "$THEME_ID" > "$CURRENT_THEME_FILE"
 
@@ -159,4 +181,4 @@ fi
 echo ""
 log_success "Theme '$THEME_NAME' applied successfully!"
 echo ""
-echo "Note: Restart Neovim to see colorscheme changes."
+echo "Neovim: Run :PvimThemeSet $NVIM_THEME or restart nvim"
