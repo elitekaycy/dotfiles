@@ -41,6 +41,9 @@ bindsym $mod+Escape exec i3lock -c 1a1b26
 # Clipboard manager (rofi-greenclip)
 bindsym $mod+v exec rofi -modi "clipboard:greenclip print" -show clipboard
 
+# Theme switcher
+bindsym $mod+t exec ~/.config/themes/scripts/rofi-theme-picker.sh
+
 # Key bindings
 bindsym $mod+Return exec kitty
 bindsym $mod+d exec rofi -show drun
@@ -197,7 +200,8 @@ set $white      #a9b1d6
 # Polybar (replaces i3bar)
 exec_always --no-startup-id ~/.config/polybar/launch.sh
 
-for_window [class=".*"] border pixel 1
+# Window border - picom applies rounded corners to match
+for_window [class=".*"] border pixel 2
 
 #                       border   bg       text     indicator child_border
 client.focused          $blue    $blue    $bg      $cyan     $blue

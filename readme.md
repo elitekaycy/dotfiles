@@ -116,6 +116,7 @@ If you prefer to install specific components:
 #### System
 | Key | Action |
 |-----|--------|
+| `Mod+t` | Theme switcher (rofi) |
 | `Mod+Escape` | Lock screen |
 | `Mod+v` | Clipboard history (rofi) |
 | `XF86AudioPlay` | Play/pause media |
@@ -224,9 +225,24 @@ Uses vim-tmux-navigator for seamless pane switching:
 
 ---
 
-## Theme
+## Theme Switcher
 
-**Tokyo Night** color scheme across all configs:
+Press `Mod+t` to open the theme picker. Changes apply to polybar, kitty, rofi, dunst, and neovim simultaneously.
+
+**Available Themes:**
+| Theme | Type |
+|-------|------|
+| Tokyo Night | Dark |
+| Tokyo Night Light | Light |
+| Catppuccin Mocha | Dark |
+| Catppuccin Latte | Light |
+| Gruvbox Dark | Dark |
+| Gruvbox Light | Light |
+| Nord | Dark |
+| Nord Light | Light |
+| Dracula | Dark |
+
+**Default: Tokyo Night**
 - Background: `#1a1b26`
 - Foreground: `#c0caf5`
 - Blue (accent): `#7aa2f7`

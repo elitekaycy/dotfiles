@@ -1,0 +1,94 @@
+/* {{THEME_NAME}} theme for rofi */
+
+configuration {
+    modi: "drun,run,window";
+    show-icons: true;
+    icon-theme: "Papirus";
+    font: "JetBrainsMono Nerd Font 12";
+    display-drun: " ";
+    display-run: " ";
+    display-window: " ";
+    drun-display-format: "{name}";
+}
+
+* {
+    bg:       {{BG}};
+    bg-alt:   {{BLACK}};
+    fg:       {{FG}};
+    fg-alt:   {{WHITE}};
+    blue:     {{PRIMARY}};
+    cyan:     {{CYAN}};
+    magenta:  {{SECONDARY}};
+    red:      {{RED}};
+
+    background-color: transparent;
+    text-color: @fg;
+    margin: 0;
+    padding: 0;
+    spacing: 0;
+}
+
+window {
+    width: 650px;
+    background-color: @bg;
+    border: 2px;
+    border-color: @blue;
+    border-radius: 8px;
+}
+
+mainbox {
+    children: [inputbar, listview];
+    padding: 12px;
+}
+
+inputbar {
+    children: [prompt, entry];
+    background-color: @bg-alt;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 0 0 10px 0;
+}
+
+prompt {
+    background-color: transparent;
+    text-color: @blue;
+    padding: 0 8px 0 0;
+}
+
+entry {
+    background-color: transparent;
+    text-color: @fg;
+    placeholder: "Search...";
+    placeholder-color: @fg-alt;
+}
+
+listview {
+    lines: 8;
+    columns: 1;
+    fixed-height: false;
+    scrollbar: false;
+}
+
+element {
+    padding: 10px;
+    border-radius: 6px;
+}
+
+element normal.normal {
+    background-color: transparent;
+    text-color: @fg;
+}
+
+element selected.normal {
+    background-color: @blue;
+    text-color: @bg;
+}
+
+element-icon {
+    size: 24px;
+    padding: 0 10px 0 0;
+}
+
+element-text {
+    vertical-align: 0.5;
+}

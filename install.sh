@@ -353,7 +353,7 @@ stow_dotfiles() {
     cd "$DOTFILES_DIR"
 
     # List of directories to stow
-    local configs=(bash zsh i3 kitty tmux nvim pvim rofi dunst picom polybar)
+    local configs=(bash zsh i3 kitty tmux nvim pvim rofi dunst picom polybar themes)
 
     for config in "${configs[@]}"; do
         if [[ -d "$config" ]]; then
@@ -393,8 +393,27 @@ make_executable() {
     chmod +x "$DOTFILES_DIR"/polybar/.config/polybar/scripts/*.sh 2>/dev/null || true
     chmod +x "$HOME"/.config/polybar/*.sh 2>/dev/null || true
     chmod +x "$HOME"/.config/polybar/scripts/*.sh 2>/dev/null || true
+    chmod +x "$DOTFILES_DIR"/themes/.config/themes/scripts/*.sh 2>/dev/null || true
+    chmod +x "$HOME"/.config/themes/scripts/*.sh 2>/dev/null || true
 
     log_success "Scripts are executable"
+}
+
+# ============================================================
+# THEME SETUP (Apply default theme)
+# ============================================================
+setup_themes() {
+    log_info "Setting up theme switcher..."
+
+    local apply_script="$HOME/.config/themes/scripts/apply-theme.sh"
+
+    if [[ -f "$apply_script" ]]; then
+        log_info "Applying default theme (tokyo-night)..."
+        bash "$apply_script" tokyo-night || true
+        log_success "Default theme applied"
+    else
+        log_warn "Theme apply script not found, skipping"
+    fi
 }
 
 # ============================================================
@@ -488,6 +507,7 @@ main() {
     stow_dotfiles
     setup_wallpapers
     make_executable
+    setup_themes
     setup_tmux
     setup_pvim
     set_zsh_default
@@ -525,6 +545,7 @@ if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     echo "  slack      Install Slack as web app (removes desktop app)"
     echo "  wallpapers Copy wallpapers to ~/Pictures/wallpapers"
     echo "  greenclip  Install clipboard manager"
+    echo "  themes     Setup theme switcher and apply default theme"
     echo ""
     exit 0
 fi
@@ -540,5 +561,6 @@ case "$1" in
     slack) install_slack ;;
     wallpapers) setup_wallpapers ;;
     greenclip) install_greenclip ;;
+    themes) setup_themes ;;
     *) main ;;
 esac
