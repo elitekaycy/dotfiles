@@ -1,57 +1,90 @@
-# My Dotfiles
+# Dotfiles
 
-These are my personal dotfiles for various applications. I use `stow` to manage them.
+Minimal, high-productivity dotfiles for i3 + kitty + tmux + zsh + neovim.
 
-## Managed Applications
+![eg](./docs/i3doc.png)
 
-This repository contains configurations for the following applications:
+## Quick Install
 
-*   **bash**: `.bashrc`
-*   **i3**: i3 window manager
-*   **i3status**: i3status bar
-*   **idea**: `.ideavimrc` for JetBrains IDEs
-*   **kitty**: kitty terminal emulator
-*   **nvim**: Neovim (LazyVim)
-*   **pvim**: A separate Neovim configuration
-*   **tmux**: tmux terminal multiplexer
-*   **vim**: `.vimrc`
-*   **zsh**: `.zshrc`
+```bash
+git clone --recurse-submodules https://github.com/elitekaycy/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+./install.sh
+```
 
-## Installation
+This will:
+- Install all dependencies (i3, kitty, tmux, zsh, neovim, etc.)
+- Install JetBrains Mono Nerd Font
+- Symlink all configs via stow
+- Set zsh as default shell
 
-1.  **Clone the repository:**
+**Supported distros:** Debian/Ubuntu, Fedora, Arch Linux
 
-    ```bash
-    git clone --recurse-submodules https://github.com/elitekaycy/dotfiles.git ~/.dotfiles
-    ```
+## Manual Install
 
-2.  **Install the dotfiles using `stow`:**
+If you prefer to install specific components:
 
-    Navigate to the cloned directory and use `stow` to create symbolic links for the desired application configurations. For example, to install the `zsh` and `tmux` configurations, you would run:
+```bash
+./install.sh core       # git, stow, curl, etc.
+./install.sh i3         # i3wm, i3blocks, rofi, dmenu, feh, flameshot, etc.
+./install.sh terminal   # kitty, tmux, zsh
+./install.sh devtools   # bat, fd, fzf, eza, ripgrep, btop
+./install.sh fonts      # JetBrains Mono Nerd Font
+./install.sh stow       # Symlink dotfiles only
+./install.sh pvim       # Setup neovim (pvim config)
+```
 
-    ```bash
-    cd ~/.dotfiles
-    stow zsh
-    stow tmux
-    ```
+## What's Included
 
-    To install all configurations, you can run the following command:
+| Config | Description |
+|--------|-------------|
+| **i3** | Tiling WM with named workspaces, floating toggles, vim-style navigation |
+| **kitty** | GPU-accelerated terminal with Catppuccin theme |
+| **tmux** | Terminal multiplexer with vim bindings, TPM plugins |
+| **zsh** | Shell with znap, pure prompt, autosuggestions, syntax highlighting |
+| **pvim** | Neovim config with LSP, treesitter, lazy.nvim |
 
-    ```bash
-    cd ~/.dotfiles
-    stow */
-    ```
+## Keybindings
+
+### i3
+
+| Key | Action |
+|-----|--------|
+| `Mod+Return` | Open terminal (kitty) |
+| `Mod+d` | Rofi launcher |
+| `Mod+b` | Firefox |
+| `Mod+Shift+q` | Kill window |
+| `Mod+h/j/k/l` | Focus left/down/up/right |
+| `Mod+Shift+h/j/k/l` | Move window |
+| `Mod+1-0` | Switch workspace |
+| `Mod+Shift+u` | Toggle Slack |
+| `Mod+Shift+i` | Toggle Spotify |
+| `Mod+Shift+o` | Toggle Obsidian |
+| `Mod+Shift+p` | Toggle floating terminal |
+| `Mod+Shift+;` | Toggle btop |
+| `Mod+Shift+s` | Screenshot (flameshot) |
+
+### tmux
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+a` | Prefix (instead of Ctrl+b) |
+| `Prefix + =` | Split vertical |
+| `Prefix + -` | Split horizontal |
+| `Alt+H/L` | Previous/next window |
+
+## Dependencies
+
+Auto-installed by `install.sh`:
+
+- **Window Manager:** i3, i3blocks, rofi, dmenu, feh, picom
+- **Terminal:** kitty, tmux, zsh
+- **Editor:** neovim
+- **Tools:** bat, fd, fzf, eza, ripgrep, btop, flameshot, redshift
+- **Fonts:** JetBrains Mono Nerd Font
 
 ## Submodules
-
-This repository uses submodules for some of the configurations. To make sure they are cloned correctly, use the `--recurse-submodules` flag when cloning the repository.
-
-If you have already cloned the repository without the submodules, you can initialize them with the following command:
 
 ```bash
 git submodule update --init --recursive
 ```
-
-<!--![eg](./docs/i3doc.png)-->
-![eg](./docs/i3doc.png)
-
