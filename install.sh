@@ -274,6 +274,46 @@ install_fonts() {
 }
 
 # ============================================================
+# SLACK (Web App - replaces desktop app)
+# ============================================================
+install_slack() {
+    log_info "Installing Slack as a web app..."
+
+    # Remove snap version if exists
+    if snap list slack &>/dev/null; then
+        log_info "Removing Slack snap..."
+        sudo snap remove slack
+    fi
+
+    # Remove deb version if exists
+    if dpkg -l | grep -q slack-desktop; then
+        log_info "Removing Slack desktop..."
+        sudo apt remove -y slack-desktop
+    fi
+
+    # Create webapp directories
+    mkdir -p ~/.local/share/webapps/slack-chrome-profile
+    mkdir -p ~/.local/share/applications
+
+    # Create desktop entry
+    cat > ~/.local/share/applications/slack-webapp.desktop << 'SLACKEOF'
+[Desktop Entry]
+Version=1.0
+Name=Slack
+Comment=Slack Web App
+Exec=google-chrome --app=https://app.slack.com --class=SlackWebApp --user-data-dir=~/.local/share/webapps/slack-chrome-profile --no-first-run --disable-infobars --disable-session-crashed-bubble
+Icon=slack
+Terminal=false
+Type=Application
+Categories=Network;InstantMessaging;
+StartupWMClass=SlackWebApp
+SLACKEOF
+
+    log_success "Slack web app installed"
+    log_info "Launch with: rofi/dmenu -> 'Slack'"
+}
+
+# ============================================================
 # STOW DOTFILES
 # ============================================================
 stow_dotfiles() {
@@ -409,8 +449,8 @@ main() {
     echo -e "  2. Select i3 as your window manager at login"
     echo -e "  3. Open a terminal and enjoy!"
     echo ""
-    echo -e "Optional: Install productivity apps manually:"
-    echo -e "  - Slack: ${YELLOW}snap install slack${NC}"
+    echo -e "Optional: Install productivity apps:"
+    echo -e "  - Slack: ${YELLOW}./install.sh slack${NC} (web app)"
     echo -e "  - Spotify: ${YELLOW}snap install spotify${NC}"
     echo -e "  - Obsidian: ${YELLOW}snap install obsidian${NC}"
     echo ""
@@ -429,6 +469,7 @@ if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     echo "  fonts      JetBrains Mono Nerd Font"
     echo "  stow       Symlink dotfiles only"
     echo "  pvim       Setup pvim (neovim config)"
+    echo "  slack      Install Slack as web app (removes desktop app)"
     echo ""
     exit 0
 fi
@@ -441,5 +482,6 @@ case "$1" in
     fonts) install_fonts ;;
     stow) stow_dotfiles && make_executable ;;
     pvim) setup_pvim ;;
+    slack) install_slack ;;
     *) main ;;
 esac
