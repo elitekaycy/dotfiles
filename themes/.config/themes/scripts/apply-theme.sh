@@ -153,23 +153,6 @@ if command -v i3-msg &> /dev/null; then
     log_success "i3 reloaded"
 fi
 
-# Reload neovim/pvim (if nvim instances are running with server)
-if command -v nvim &> /dev/null; then
-    nvim_updated=false
-    # Find pvim/nvim server sockets
-    for sock in /tmp/pvim-* /run/user/$(id -u)/nvim.*.0 /tmp/nvim*/0; do
-        if [[ -S "$sock" ]]; then
-            nvim --server "$sock" --remote-send "<Cmd>PvimThemeSet $NVIM_THEME<CR>" 2>/dev/null && {
-                log_success "Neovim theme updated (${sock##*/})"
-                nvim_updated=true
-            }
-        fi
-    done 2>/dev/null
-    if [[ "$nvim_updated" == "false" ]]; then
-        log_warn "No nvim servers found - restart nvim to apply theme"
-    fi
-fi
-
 # Save current theme ID
 echo "$THEME_ID" > "$CURRENT_THEME_FILE"
 
