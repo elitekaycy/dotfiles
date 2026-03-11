@@ -112,6 +112,8 @@ if [[ -n "$WALLPAPER" ]]; then
     if [[ -f "$WALLPAPER_PATH" ]]; then
         log_info "Setting wallpaper: $WALLPAPER"
         feh --bg-fill "$WALLPAPER_PATH" 2>/dev/null || true
+        # Save for persistence across reboots
+        echo "$WALLPAPER_PATH" > "$HOME/.config/current-wallpaper"
         log_success "Wallpaper applied"
     else
         log_warn "Wallpaper not found: $WALLPAPER_PATH"
@@ -121,11 +123,7 @@ fi
 # Reload applications
 log_info "Reloading applications..."
 
-# Reload polybar
-if pgrep -x polybar > /dev/null; then
-    pkill -x polybar
-    sleep 0.5
-fi
+# Reload polybar (launch.sh handles killing existing instances)
 ~/.config/polybar/launch.sh &>/dev/null &
 log_success "Polybar reloaded"
 

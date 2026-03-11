@@ -163,7 +163,8 @@ exec --no-startup-id blueman-applet
 
 exec --no-startup-id xinput list --name-only | grep -i touchpad | xargs -I {} xinput set-prop "{}" "libinput Natural Scrolling Enabled" 1
 
-exec_always --no-startup-id sh -c 'feh --bg-fill "$HOME/Pictures/wallpapers/an.jpg"'
+# Wallpaper - use saved wallpaper or default
+exec_always --no-startup-id sh -c 'if [ -f "$HOME/.config/current-wallpaper" ]; then feh --bg-fill "$(cat $HOME/.config/current-wallpaper)"; else feh --bg-fill "$HOME/Pictures/wallpapers/tokyo-night.jpg"; fi'
 
 
 
