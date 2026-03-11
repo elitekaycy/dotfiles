@@ -1,66 +1,50 @@
 #!/usr/bin/env bash
-# Language runtimes via asdf: Node.js, Java, Python
+# Language runtimes via mise: Node.js, Java, Python
 
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
-# Ensure asdf is loaded
-load_asdf() {
-    if [[ -f "$HOME/.asdf/asdf.sh" ]]; then
-        . "$HOME/.asdf/asdf.sh"
-    else
-        log_error "asdf not installed. Run ./install.sh zsh first."
+# Ensure mise is available
+check_mise() {
+    if ! has mise; then
+        log_error "mise not installed. Run ./install.sh zsh first."
         return 1
     fi
+    # Activate mise for current shell
+    eval "$(mise activate bash 2>/dev/null)" || true
 }
 
 install_nodejs() {
-    load_asdf || return
+    check_mise || return
 
-    if asdf plugin list 2>/dev/null | grep -q nodejs; then
-        log_success "asdf nodejs plugin already installed"
+    log_info "Installing Node.js via mise..."
+
+    # Install Node.js 22 (LTS)
+    if mise list node 2>/dev/null | grep -q "22"; then
+        log_success "Node.js 22 already installed"
     else
-        log_info "Adding asdf nodejs plugin..."
-        asdf plugin add nodejs
+        mise use --global node@22
     fi
 
-    # Install latest LTS
-    local version=$(asdf latest nodejs 22)
-    if asdf list nodejs 2>/dev/null | grep -q "$version"; then
-        log_success "Node.js $version already installed"
-    else
-        log_info "Installing Node.js $version..."
-        asdf install nodejs "$version"
-        asdf global nodejs "$version"
-    fi
-
-    log_success "Node.js ready ($(node --version 2>/dev/null || echo 'restart shell'))"
+    log_success "Node.js ready ($(mise exec -- node --version 2>/dev/null || echo 'restart shell'))"
 }
 
 install_java() {
-    load_asdf || return
+    check_mise || return
 
-    if asdf plugin list 2>/dev/null | grep -q java; then
-        log_success "asdf java plugin already installed"
-    else
-        log_info "Adding asdf java plugin..."
-        asdf plugin add java
-    fi
+    log_info "Installing Java via mise..."
 
     # Install Java 21 (LTS)
-    local version="openjdk-21"
-    if asdf list java 2>/dev/null | grep -q "$version"; then
-        log_success "Java $version already installed"
+    if mise list java 2>/dev/null | grep -q "21"; then
+        log_success "Java 21 already installed"
     else
-        log_info "Installing Java $version..."
-        asdf install java "$version"
-        asdf global java "$version"
+        mise use --global java@21
     fi
 
     log_success "Java ready"
 }
 
 install_python() {
-    load_asdf || return
+    check_mise || return
 
     # Python build dependencies
     case "$OS" in
@@ -78,28 +62,20 @@ install_python() {
             ;;
     esac
 
-    if asdf plugin list 2>/dev/null | grep -q python; then
-        log_success "asdf python plugin already installed"
-    else
-        log_info "Adding asdf python plugin..."
-        asdf plugin add python
-    fi
+    log_info "Installing Python via mise..."
 
     # Install Python 3.12
-    local version=$(asdf latest python 3.12)
-    if asdf list python 2>/dev/null | grep -q "$version"; then
-        log_success "Python $version already installed"
+    if mise list python 2>/dev/null | grep -q "3.12"; then
+        log_success "Python 3.12 already installed"
     else
-        log_info "Installing Python $version (this may take a while)..."
-        asdf install python "$version"
-        asdf global python "$version"
+        mise use --global python@3.12
     fi
 
     log_success "Python ready"
 }
 
 install_pnpm() {
-    load_asdf || return
+    check_mise || return
 
     if has pnpm; then
         log_success "pnpm already installed"
@@ -107,14 +83,15 @@ install_pnpm() {
     fi
 
     log_info "Installing pnpm..."
-    if has npm; then
-        npm install -g pnpm
-    elif has corepack; then
-        corepack enable
-        corepack prepare pnpm@latest --activate
+
+    # Use mise to install pnpm directly (it supports it)
+    if mise plugins ls 2>/dev/null | grep -q pnpm; then
+        mise use --global pnpm@latest
     else
-        curl -fsSL https://get.pnpm.io/install.sh | sh -
+        # Fallback to npm install
+        mise exec -- npm install -g pnpm 2>/dev/null || curl -fsSL https://get.pnpm.io/install.sh | sh -
     fi
+
     log_success "pnpm installed"
 }
 

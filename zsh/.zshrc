@@ -128,8 +128,8 @@ znap source marlonrichert/zsh-autocomplete
 # `znap install` adds new commands and completions.
 znap install zsh-users/zsh-completions
 
-# Load asdf if installed
-[[ -f "$HOME/.asdf/asdf.sh" ]] && . "$HOME/.asdf/asdf.sh"
+# Load mise (version manager) if installed
+command -v mise &>/dev/null && eval "$(mise activate zsh)"
 
 # Use bat as cat (if installed)
 command -v batcat &>/dev/null && alias cat="batcat"
@@ -216,9 +216,9 @@ alias kaf="kubectl apply -f"
 alias kdf="kubectl delete -f"
 
 
-# Source java from asdf to java home (if available)
-if command -v asdf &>/dev/null && asdf where java &>/dev/null; then
-    export JAVA_HOME="$(asdf where java)"
+# Source java from mise to java home (if available)
+if command -v mise &>/dev/null && mise where java &>/dev/null 2>&1; then
+    export JAVA_HOME="$(mise where java)"
     export PATH="$JAVA_HOME/bin:$PATH"
 fi
 
@@ -245,9 +245,9 @@ case ":$PATH:" in
 esac
 # pnpm end
 
-# Tomcat/Java from asdf (if available)
-command -v asdf &>/dev/null && asdf where tomcat &>/dev/null && export CATALINA_HOME=$(asdf where tomcat)
-command -v asdf &>/dev/null && asdf where java &>/dev/null && export JAVA_HOME=$(asdf where java)
+# Tomcat/Java from mise (if available)
+command -v mise &>/dev/null && mise where tomcat &>/dev/null 2>&1 && export CATALINA_HOME=$(mise where tomcat)
+command -v mise &>/dev/null && mise where java &>/dev/null 2>&1 && export JAVA_HOME=$(mise where java)
 
 # Atuin shell history (if installed)
 [[ -f "$HOME/.atuin/bin/env" ]] && . "$HOME/.atuin/bin/env"

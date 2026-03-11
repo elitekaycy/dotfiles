@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Zsh ecosystem: Oh My Zsh, asdf, atuin
+# Zsh ecosystem: Oh My Zsh, mise, atuin
 
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
@@ -14,15 +14,19 @@ install_ohmyzsh() {
     log_success "Oh My Zsh installed"
 }
 
-install_asdf() {
-    if [[ -d "$HOME/.asdf" ]]; then
-        log_success "asdf already installed"
+install_mise() {
+    if has mise; then
+        log_success "mise already installed"
         return
     fi
 
-    log_info "Installing asdf..."
-    git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
-    log_success "asdf installed"
+    log_info "Installing mise..."
+    curl https://mise.run | sh
+
+    # Add to path for current session
+    export PATH="$HOME/.local/bin:$PATH"
+
+    log_success "mise installed"
 }
 
 install_atuin() {
@@ -49,7 +53,7 @@ set_zsh_default() {
 
 install_zsh_ecosystem() {
     install_ohmyzsh
-    install_asdf
+    install_mise
     install_atuin
 }
 
