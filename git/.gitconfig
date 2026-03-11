@@ -1,0 +1,76 @@
+[user]
+    name = elitekaycy
+    email = dicksonanyaele1234@gmail.com
+
+[init]
+    defaultBranch = main
+
+[core]
+    editor = nvim
+    autocrlf = input
+    pager = delta
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+    light = false
+    side-by-side = true
+    line-numbers = true
+
+[merge]
+    conflictstyle = diff3
+
+[diff]
+    colorMoved = default
+
+[pull]
+    rebase = true
+
+[push]
+    default = current
+    autoSetupRemote = true
+
+[fetch]
+    prune = true
+
+[rebase]
+    autoStash = true
+
+[alias]
+    # Status and log
+    s = status -sb
+    l = log --oneline -20
+    lg = log --graph --oneline --decorate --all
+    last = log -1 HEAD --stat
+
+    # Branching
+    co = checkout
+    cob = checkout -b
+    br = branch
+    bra = branch -a
+
+    # Commit shortcuts
+    cm = commit -m
+    ca = commit --amend
+    can = commit --amend --no-edit
+
+    # Diff
+    d = diff
+    ds = diff --staged
+
+    # Undo
+    unstage = reset HEAD --
+    undo = reset --soft HEAD~1
+
+    # Stash
+    st = stash
+    stp = stash pop
+    stl = stash list
+
+    # Clean
+    cleanup = !git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -d
+
+[credential]
+    helper = cache --timeout=3600

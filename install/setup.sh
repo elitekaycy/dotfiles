@@ -10,7 +10,7 @@ stow_dotfiles() {
 
     cd "$DOTFILES_DIR"
 
-    local configs=(bash zsh i3 kitty tmux nvim pvim rofi dunst picom polybar themes)
+    local configs=(bash zsh i3 kitty tmux nvim pvim rofi dunst picom polybar themes git)
 
     for config in "${configs[@]}"; do
         if [[ -d "$config" ]]; then

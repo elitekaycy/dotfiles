@@ -19,6 +19,9 @@ source "$INSTALL_DIR/rust.sh"
 source "$INSTALL_DIR/zsh.sh"
 source "$INSTALL_DIR/slack.sh"
 source "$INSTALL_DIR/media.sh"
+source "$INSTALL_DIR/docker.sh"
+source "$INSTALL_DIR/chrome.sh"
+source "$INSTALL_DIR/languages.sh"
 source "$INSTALL_DIR/setup.sh"
 
 # Ensure submodules are initialized (for pvim)
@@ -38,7 +41,12 @@ show_help() {
     echo "  i3         i3 window manager and tools"
     echo "  terminal   Kitty, tmux, zsh"
     echo "  neovim     Neovim (latest via AppImage on Debian/Ubuntu)"
-    echo "  devtools   bat, fd, fzf, eza, ripgrep, btop"
+    echo "  devtools   bat, fd, fzf, eza, ripgrep, btop, jq"
+    echo "  docker     Docker and Docker Compose"
+    echo "  chrome     Google Chrome browser"
+    echo "  languages  Node.js, Java, Python via asdf"
+    echo "  gh         GitHub CLI"
+    echo "  lazygit    Lazygit TUI"
     echo "  fonts      JetBrains Mono Nerd Font"
     echo "  greenclip  Clipboard manager"
     echo "  rust       Rust toolchain"
@@ -80,9 +88,15 @@ main() {
     install_terminal
     install_neovim
     install_devtools
+    install_gh
+    install_lazygit
+    install_delta
+    install_docker
+    install_chrome
     install_rust
     install_zsh_ecosystem
     install_fonts
+    install_languages
 
     echo ""
     log_info "Setting up configurations..."
@@ -158,6 +172,21 @@ case "$1" in
         ;;
     media)
         install_media
+        ;;
+    docker)
+        install_docker
+        ;;
+    chrome)
+        install_chrome
+        ;;
+    languages)
+        install_languages
+        ;;
+    gh)
+        install_gh
+        ;;
+    lazygit)
+        install_lazygit
         ;;
     wallpapers)
         setup_wallpapers
