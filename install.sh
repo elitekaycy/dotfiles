@@ -18,6 +18,7 @@ source "$INSTALL_DIR/greenclip.sh"
 source "$INSTALL_DIR/rust.sh"
 source "$INSTALL_DIR/zsh.sh"
 source "$INSTALL_DIR/slack.sh"
+source "$INSTALL_DIR/media.sh"
 source "$INSTALL_DIR/setup.sh"
 
 # Ensure submodules are initialized (for pvim)
@@ -47,6 +48,7 @@ show_help() {
     echo "  pvim       Setup pvim (neovim config)"
     echo "  themes     Apply default theme"
     echo "  slack      Install Slack as web app"
+    echo "  media      Spotify TUI, ani-cli, lobster (movies)"
     echo "  wallpapers Copy wallpapers"
     echo ""
 }
@@ -153,6 +155,9 @@ case "$1" in
         ;;
     slack)
         install_slack
+        ;;
+    media)
+        install_media
         ;;
     wallpapers)
         setup_wallpapers

@@ -1,4 +1,4 @@
-/* Catppuccin Mocha theme for rofi */
+/* Dracula theme for rofi */
 
 configuration {
     modi: "drun,run,window";
@@ -12,14 +12,14 @@ configuration {
 }
 
 * {
-    bg:       #1e1e2e;
-    bg-alt:   #11111b;
-    fg:       #cdd6f4;
-    fg-alt:   #bac2de;
-    blue:     #89b4fa;
-    cyan:     #89dceb;
-    magenta:  #cba6f7;
-    red:      #f38ba8;
+    bg:       #282a36;
+    bg-alt:   #21222c;
+    fg:       #f8f8f2;
+    fg-alt:   #f8f8f2;
+    blue:     #bd93f9;
+    cyan:     #8be9fd;
+    magenta:  #ff79c6;
+    red:      #ff5555;
 
     background-color: transparent;
     text-color: @fg;
