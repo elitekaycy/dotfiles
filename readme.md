@@ -22,6 +22,17 @@ Zero manual steps. This handles everything:
 
 **Supported distros:** Debian/Ubuntu, Fedora, Arch Linux
 
+## Update Across Machines
+
+After pushing changes (new tools, config updates, nvim plugins, etc.), run on any machine:
+
+```bash
+cd ~/dotfiles
+./update.sh
+```
+
+This will pull latest changes, re-stow all configs, sync mise tools, update submodules (pvim, etc.), and install any new tmux plugins.
+
 ## Selective Install
 
 ```bash
