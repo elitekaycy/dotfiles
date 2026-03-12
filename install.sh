@@ -22,6 +22,7 @@ source "$INSTALL_DIR/media.sh"
 source "$INSTALL_DIR/docker.sh"
 source "$INSTALL_DIR/chrome.sh"
 source "$INSTALL_DIR/languages.sh"
+source "$INSTALL_DIR/uninstall.sh"
 source "$INSTALL_DIR/setup.sh"
 
 # Ensure submodules are initialized (for pvim)
@@ -91,7 +92,9 @@ main() {
     # Zsh ecosystem (installs mise)
     install_zsh_ecosystem
 
-    # Stow dotfiles first so mise config.toml is in place
+    # Backup existing configs, then stow
+    echo ""
+    uninstall
     echo ""
     log_info "Setting up configurations..."
     echo ""
