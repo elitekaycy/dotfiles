@@ -132,7 +132,7 @@ znap install zsh-users/zsh-completions
 command -v mise &>/dev/null && eval "$(mise activate zsh)"
 
 # Use bat as cat (if installed)
-command -v batcat &>/dev/null && alias cat="batcat"
+command -v bat &>/dev/null && alias cat="bat"
 command -v bat &>/dev/null && alias cat="bat"
 
 
@@ -185,7 +185,7 @@ _fzf_compgen_dir() {
 
 # source ~/fzf-git.sh/fzf-git.sh
 
-export FZF_CTRL_T_OPTS="--preview 'batcat -n --color=always --line-range :500 {}'"
+export FZF_CTRL_T_OPTS="--preview 'bat -n --color=always --line-range :500 {}'"
 export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always {} | head -200'"
 
 # Advanced customization of fzf options via _fzf_comprun function
@@ -199,7 +199,7 @@ _fzf_comprun() {
     cd)           fzf --preview 'eza --tree --color=always {} | head -200' "$@" ;;
     export|unset) fzf --preview "eval 'echo $'{}"         "$@" ;;
     ssh)          fzf --preview 'dig {}'                   "$@" ;;
-    *)            fzf --preview "batcat -n --color=always --line-range :500 {}" "$@" ;;
+    *)            fzf --preview "bat -n --color=always --line-range :500 {}" "$@" ;;
   esac
 }
 
@@ -255,11 +255,11 @@ command -v atuin &>/dev/null && eval "$(atuin init zsh)"
 alias scaffold='bash $HOME/Desktop/cli/scaffold-module-java/scaffold.sh'
 
 
-# Auto-install z if not present
-[[ ! -f ~/z/z.sh ]] && git clone --depth 1 https://github.com/rupa/z.git ~/z
+# Smart directory jumping (zoxide replaces z)
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
 
-# Load z
-. ~/z/z.sh
+# Per-directory env vars
+command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
 
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
 export AWS_PROFILE=sandbox-elitekaycy
