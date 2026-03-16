@@ -133,7 +133,6 @@ command -v mise &>/dev/null && eval "$(mise activate zsh)"
 
 # Use bat as cat (if installed)
 command -v bat &>/dev/null && alias cat="bat"
-command -v bat &>/dev/null && alias cat="bat"
 
 
 # TMUX SESSION EXIST OR CREATE

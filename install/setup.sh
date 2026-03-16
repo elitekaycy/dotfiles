@@ -15,7 +15,8 @@ stow_dotfiles() {
     for config in "${configs[@]}"; do
         if [[ -d "$config" ]]; then
             log_info "  Stowing $config..."
-            stow -R "$config" 2>/dev/null || stow "$config"
+            stow -D "$config" >/dev/null 2>&1
+            stow "$config" >/dev/null 2>&1
         fi
     done
 
