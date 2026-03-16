@@ -22,6 +22,7 @@ source "$INSTALL_DIR/media.sh"
 source "$INSTALL_DIR/docker.sh"
 source "$INSTALL_DIR/chrome.sh"
 source "$INSTALL_DIR/languages.sh"
+source "$INSTALL_DIR/nvidia.sh"
 source "$INSTALL_DIR/uninstall.sh"
 source "$INSTALL_DIR/setup.sh"
 
@@ -39,6 +40,7 @@ show_help() {
     echo "Components:"
     echo "  (none)     Install everything"
     echo "  core       Core packages (git, stow, curl, etc.)"
+    echo "  nvidia     NVIDIA drivers (auto-detects GPU)"
     echo "  i3         i3 window manager and tools"
     echo "  terminal   Kitty, tmux, zsh"
     echo "  devtools   All CLI tools via mise (bat, fd, fzf, eza, rg, etc.)"
@@ -81,6 +83,7 @@ main() {
 
     # System packages (need apt/dnf/pacman)
     install_core
+    install_nvidia
     install_i3
     install_greenclip
     install_terminal
@@ -179,6 +182,9 @@ case "$1" in
         ;;
     languages)
         install_languages
+        ;;
+    nvidia)
+        install_nvidia
         ;;
     wallpapers)
         setup_wallpapers
