@@ -18,7 +18,8 @@ listview { lines: 6; }
 # Confirm for destructive actions
 confirm_action() {
     local action=$1
-    local confirm=$(echo -e "Yes\nNo" | rofi -dmenu -i -p "Confirm $action?" -theme-str '
+    local confirm
+    confirm=$(echo -e "Yes\nNo" | rofi -dmenu -i -p "Confirm $action?" -theme-str '
 window { width: 200px; }
 listview { lines: 2; }
 ')

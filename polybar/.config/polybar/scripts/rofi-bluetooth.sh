@@ -15,9 +15,6 @@ connected_devices=$(bluetoothctl devices Connected 2>/dev/null)
 # Get paired devices
 paired_devices=$(bluetoothctl devices Paired 2>/dev/null)
 
-# Get available devices (from scan)
-available_devices=$(bluetoothctl devices 2>/dev/null)
-
 # Build menu
 menu="$toggle_bt\n$scan_bt"
 [[ -n "$connected_devices" ]] && menu="$menu\n$disconnect_all"
