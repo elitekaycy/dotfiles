@@ -36,15 +36,16 @@ pkg_install() {
     case "$OS" in
         debian) sudo apt-get install -y "$@" ;;
         fedora) sudo dnf install -y "$@" ;;
-        arch) sudo pacman -S --noconfirm "$@" ;;
+        arch) sudo pacman -S --needed --noconfirm "$@" ;;
     esac
 }
 
 pkg_update() {
     case "$OS" in
         debian) sudo apt-get update ;;
-        fedora) sudo dnf check-update || true ;;
-        arch) sudo pacman -Sy ;;
+        fedora) sudo dnf makecache ;;
+        # Avoid a partial Arch upgrade (`pacman -Sy` followed by installs).
+        arch) sudo pacman -Syu --noconfirm ;;
     esac
 }
 

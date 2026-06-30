@@ -8,13 +8,13 @@ install_core() {
 
     case "$OS" in
         debian)
-            pkg_install git curl wget stow build-essential unzip xclip
+            pkg_install git curl wget stow build-essential unzip xclip pciutils fontconfig
             ;;
         fedora)
-            pkg_install git curl wget stow gcc make unzip xclip
+            pkg_install git curl wget stow gcc make unzip xclip pciutils fontconfig
             ;;
         arch)
-            pkg_install git curl wget stow base-devel unzip xclip
+            pkg_install git curl wget stow base-devel unzip xclip pciutils fontconfig
             ;;
     esac
 

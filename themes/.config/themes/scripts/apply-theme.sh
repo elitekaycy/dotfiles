@@ -1,70 +1,86 @@
 #!/usr/bin/env bash
-#
-# Theme Switcher - Apply theme across all configs
-# Usage: apply-theme.sh <theme-name>
-#
+# Render and optionally apply one repository theme.
 
-set -e
+set -Eeuo pipefail
 
-THEMES_DIR="$HOME/.config/themes"
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles"
+THEMES_DIR="$CONFIG_HOME/themes"
 THEMES_CONF_DIR="$THEMES_DIR/themes"
 TEMPLATES_DIR="$THEMES_DIR/templates"
-CURRENT_THEME_FILE="$THEMES_DIR/current"
+CURRENT_THEME_FILE="$STATE_DIR/theme"
+RELOAD_APPS=true
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+C_RED='\033[0;31m'
+C_GREEN='\033[0;32m'
+C_YELLOW='\033[1;33m'
+C_BLUE='\033[0;34m'
+C_NONE='\033[0m'
 
-log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
-log_success() { echo -e "${GREEN}[OK]${NC} $1"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+log_info() { echo -e "${C_BLUE}[INFO]${C_NONE} $1"; }
+log_success() { echo -e "${C_GREEN}[OK]${C_NONE} $1"; }
+log_warn() { echo -e "${C_YELLOW}[WARN]${C_NONE} $1"; }
+log_error() { echo -e "${C_RED}[ERROR]${C_NONE} $1"; }
 
-# Check if theme name provided
-if [[ -z "$1" ]]; then
-    echo "Usage: apply-theme.sh <theme-name>"
+if [[ "${1:-}" == "--no-reload" ]]; then
+    RELOAD_APPS=false
+    shift
+fi
+
+THEME_ID="${1:-}"
+if [[ -z "$THEME_ID" ]]; then
+    echo "Usage: apply-theme.sh [--no-reload] <theme-name>"
     echo "Available themes:"
     for theme in "$THEMES_CONF_DIR"/*.conf; do
-        basename "$theme" .conf
+        [[ -f "$theme" ]] && basename "$theme" .conf
     done
     exit 1
 fi
 
-THEME_ID="$1"
 THEME_FILE="$THEMES_CONF_DIR/$THEME_ID.conf"
-
-# Check if theme exists
 if [[ ! -f "$THEME_FILE" ]]; then
     log_error "Theme not found: $THEME_ID"
-    echo "Available themes:"
-    for theme in "$THEMES_CONF_DIR"/*.conf; do
-        basename "$theme" .conf
-    done
     exit 1
 fi
 
-log_info "Applying theme: $THEME_ID"
-
-# Source the theme file to get all color variables
+# shellcheck disable=SC1090
 source "$THEME_FILE"
+: "${THEME_NAME:?Theme must define THEME_NAME}"
+: "${THEME_TYPE:?Theme must define THEME_TYPE}"
+: "${NVIM_THEME:?Theme must define NVIM_THEME}"
 
-# Function to replace placeholders in a template
+prepare_generated_output() {
+    local output="$1"
+    local link_target=""
+    local themes_real=""
+    local repository_root=""
+
+    if [[ -L "$output" ]]; then
+        link_target="$(readlink -f "$output" 2>/dev/null || true)"
+        themes_real="$(readlink -f "$THEMES_DIR" 2>/dev/null || true)"
+        repository_root="${themes_real%/themes/.config/themes}"
+
+        # Migrate links created by older revisions. Foreign user-managed links
+        # are deliberately left in place and receive the rendered content.
+        if [[ -n "$repository_root" && "$link_target" == "$repository_root/"* ]]; then
+            rm -- "$output"
+        fi
+    fi
+
+    mkdir -p "$(dirname "$output")"
+}
+
 apply_template() {
     local template="$1"
     local output="$2"
+    local content
 
     if [[ ! -f "$template" ]]; then
-        log_warn "Template not found: $template"
-        return
+        log_error "Template not found: $template"
+        return 1
     fi
 
-    local content
-    content=$(cat "$template")
-
-    # Replace all {{VAR}} placeholders
+    content="$(<"$template")"
     content="${content//\{\{THEME_NAME\}\}/$THEME_NAME}"
     content="${content//\{\{THEME_TYPE\}\}/$THEME_TYPE}"
     content="${content//\{\{BG\}\}/$BG}"
@@ -83,83 +99,52 @@ apply_template() {
     content="${content//\{\{WHITE\}\}/$WHITE}"
     content="${content//\{\{BLACK\}\}/$BLACK}"
 
-    # Create parent directory if needed
-    mkdir -p "$(dirname "$output")"
-
-    # Write to output file
-    echo "$content" > "$output"
-    log_success "Applied: $(basename "$output")"
+    prepare_generated_output "$output"
+    printf '%s\n' "$content" > "$output"
+    log_success "Rendered: ${output#"$HOME"/}"
 }
 
-# Apply all templates
-log_info "Applying config templates..."
+log_info "Rendering theme: $THEME_ID"
+apply_template "$TEMPLATES_DIR/polybar.template" "$CONFIG_HOME/polybar/config.ini"
+apply_template "$TEMPLATES_DIR/kitty.template" "$CONFIG_HOME/kitty/theme.conf"
+apply_template "$TEMPLATES_DIR/dunst.template" "$CONFIG_HOME/dunst/dunstrc"
+apply_template "$TEMPLATES_DIR/rofi.template" "$CONFIG_HOME/rofi/config.rasi"
 
-apply_template "$TEMPLATES_DIR/polybar.template" "$HOME/.config/polybar/config.ini"
-apply_template "$TEMPLATES_DIR/kitty.template" "$HOME/.config/kitty/theme.conf"
-apply_template "$TEMPLATES_DIR/dunst.template" "$HOME/.config/dunst/dunstrc"
-apply_template "$TEMPLATES_DIR/rofi.template" "$HOME/.config/rofi/config.rasi"
+mkdir -p "$HOME/.local/share/nvim" "$STATE_DIR"
+printf '%s\n' "$NVIM_THEME" > "$HOME/.local/share/nvim/pvim_theme.txt"
+printf '%s\n' "$THEME_ID" > "$CURRENT_THEME_FILE"
 
-# Update Neovim/pvim theme
-log_info "Updating Neovim theme..."
-NVIM_THEME_FILE="$HOME/.local/share/nvim/pvim_theme.txt"
-mkdir -p "$(dirname "$NVIM_THEME_FILE")"
-echo "$NVIM_THEME" > "$NVIM_THEME_FILE"
-log_success "Neovim theme set to: $NVIM_THEME"
-
-# Change wallpaper if specified and exists
-if [[ -n "$WALLPAPER" ]]; then
-    WALLPAPER_PATH="$HOME/Pictures/wallpapers/$WALLPAPER"
-    if [[ -f "$WALLPAPER_PATH" ]]; then
-        log_info "Setting wallpaper: $WALLPAPER"
-        feh --bg-fill "$WALLPAPER_PATH" 2>/dev/null || true
-        # Save for persistence across reboots
-        echo "$WALLPAPER_PATH" > "$HOME/.config/current-wallpaper"
-        log_success "Wallpaper applied"
+if [[ -n "${WALLPAPER:-}" ]]; then
+    wallpaper_path="$HOME/Pictures/wallpapers/$WALLPAPER"
+    if [[ -f "$wallpaper_path" ]]; then
+        printf '%s\n' "$wallpaper_path" > "$CONFIG_HOME/current-wallpaper"
+        if [[ "$RELOAD_APPS" == "true" && -n "${DISPLAY:-}" ]] && command -v feh >/dev/null; then
+            feh --bg-fill "$wallpaper_path" >/dev/null 2>&1 || true
+        fi
     else
-        log_warn "Wallpaper not found: $WALLPAPER_PATH"
+        log_warn "Wallpaper not found: $wallpaper_path"
     fi
 fi
 
-# Reload applications
-log_info "Reloading applications..."
+if [[ "$RELOAD_APPS" == "true" && -n "${DISPLAY:-}" ]]; then
+    if [[ -x "$CONFIG_HOME/polybar/launch.sh" ]]; then
+        "$CONFIG_HOME/polybar/launch.sh" >/dev/null 2>&1 &
+    fi
 
-# Reload polybar (launch.sh handles killing existing instances)
-~/.config/polybar/launch.sh &>/dev/null &
-log_success "Polybar reloaded"
+    if command -v kitty >/dev/null; then
+        for sock in /tmp/mykitty*; do
+            [[ -S "$sock" ]] || continue
+            kitty @ --to "unix:$sock" set-colors -a -c "$CONFIG_HOME/kitty/theme.conf" >/dev/null 2>&1 || true
+        done
+    fi
 
-# Reload kitty (if running with remote control)
-if command -v kitty &> /dev/null; then
-    # Find kitty socket (may include PID suffix)
-    for sock in /tmp/mykitty*; do
-        if [[ -S "$sock" ]]; then
-            kitty @ --to "unix:$sock" set-colors -a -c "$HOME/.config/kitty/theme.conf" 2>/dev/null && \
-                log_success "Kitty colors updated (${sock##*/})"
-        fi
-    done
+    if command -v dunstctl >/dev/null; then
+        pkill dunst 2>/dev/null || true
+        dunst >/dev/null 2>&1 &
+    fi
+
+    command -v i3-msg >/dev/null && i3-msg reload >/dev/null 2>&1 || true
+    command -v notify-send >/dev/null && notify-send "Theme Switcher" "Applied theme: $THEME_NAME" -i preferences-desktop-theme || true
 fi
 
-# Reload dunst
-if command -v dunstctl &> /dev/null; then
-    pkill dunst 2>/dev/null || true
-    dunst &>/dev/null &
-    log_success "Dunst reloaded"
-fi
-
-# Reload i3 (refreshes window borders)
-if command -v i3-msg &> /dev/null; then
-    i3-msg reload &>/dev/null || true
-    log_success "i3 reloaded"
-fi
-
-# Save current theme ID
-echo "$THEME_ID" > "$CURRENT_THEME_FILE"
-
-# Send notification
-if command -v notify-send &> /dev/null; then
-    notify-send "Theme Switcher" "Applied theme: $THEME_NAME" -i preferences-desktop-theme
-fi
-
-echo ""
-log_success "Theme '$THEME_NAME' applied successfully!"
-echo ""
-echo "Neovim: Run :PvimThemeSet $NVIM_THEME or restart nvim"
+log_success "Theme '$THEME_NAME' applied"

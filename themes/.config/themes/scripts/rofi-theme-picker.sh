@@ -3,10 +3,11 @@
 # Rofi Theme Picker - Select and apply themes via rofi
 #
 
-THEMES_DIR="$HOME/.config/themes"
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+THEMES_DIR="$CONFIG_HOME/themes"
 THEMES_CONF_DIR="$THEMES_DIR/themes"
 SCRIPTS_DIR="$THEMES_DIR/scripts"
-CURRENT_THEME_FILE="$THEMES_DIR/current"
+CURRENT_THEME_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/theme"
 
 # Get current theme
 CURRENT=""

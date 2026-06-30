@@ -17,6 +17,9 @@ install_i3() {
                 brightnessctl \
                 network-manager-gnome \
                 blueman \
+                firefox \
+                volumeicon-alsa \
+                x11-xserver-utils \
                 xinput \
                 acpi \
                 alsa-utils \
@@ -41,6 +44,9 @@ install_i3() {
                 brightnessctl \
                 network-manager-applet \
                 blueman \
+                firefox \
+                volumeicon \
+                xorg-x11-server-utils \
                 xinput \
                 acpi \
                 alsa-utils \
@@ -65,6 +71,9 @@ install_i3() {
                 brightnessctl \
                 network-manager-applet \
                 blueman \
+                firefox \
+                volumeicon \
+                xorg-xset \
                 xorg-xinput \
                 acpi \
                 alsa-utils \

@@ -2,25 +2,10 @@
 # Setup: stow dotfiles, wallpapers, themes, tmux, pvim
 
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
-
-DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$(dirname "${BASH_SOURCE[0]}")/deploy.sh"
 
 stow_dotfiles() {
-    log_info "Stowing dotfiles..."
-
-    cd "$DOTFILES_DIR"
-
-    local configs=(bash zsh i3 kitty tmux nvim pvim rofi dunst picom polybar themes git mise)
-
-    for config in "${configs[@]}"; do
-        if [[ -d "$config" ]]; then
-            log_info "  Stowing $config..."
-            stow -D "$config" >/dev/null 2>&1
-            stow "$config" >/dev/null 2>&1
-        fi
-    done
-
-    log_success "Dotfiles stowed"
+    deploy_dotfiles "${1:-false}"
 }
 
 setup_wallpapers() {
@@ -29,7 +14,7 @@ setup_wallpapers() {
     mkdir -p "$HOME/Pictures/wallpapers"
 
     if [[ -d "$DOTFILES_DIR/wallpapers" ]]; then
-        cp -r "$DOTFILES_DIR/wallpapers/"* "$HOME/Pictures/wallpapers/" 2>/dev/null || true
+        cp -a "$DOTFILES_DIR/wallpapers/." "$HOME/Pictures/wallpapers/"
         log_success "Wallpapers copied to ~/Pictures/wallpapers/"
     else
         log_warn "No wallpapers directory found in dotfiles"
@@ -52,14 +37,26 @@ make_executable() {
 }
 
 setup_themes() {
+    local state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles"
+    local current_theme_file="$state_dir/theme"
+    local theme="tokyo-night"
+    local reload="${1:-false}"
     log_info "Setting up theme switcher..."
 
-    local apply_script="$HOME/.config/themes/scripts/apply-theme.sh"
+    local apply_script="${XDG_CONFIG_HOME:-$HOME/.config}/themes/scripts/apply-theme.sh"
+
+    if [[ -s "$current_theme_file" ]]; then
+        theme="$(<"$current_theme_file")"
+    fi
 
     if [[ -f "$apply_script" ]]; then
-        log_info "Applying default theme (tokyo-night)..."
-        bash "$apply_script" tokyo-night || true
-        log_success "Default theme applied"
+        log_info "Rendering theme ($theme)..."
+        if [[ "$reload" == "true" ]]; then
+            bash "$apply_script" "$theme"
+        else
+            bash "$apply_script" --no-reload "$theme"
+        fi
+        log_success "Theme rendered"
     else
         log_warn "Theme apply script not found, skipping"
     fi
@@ -67,8 +64,20 @@ setup_themes() {
 
 setup_tmux() {
     local tpm_dir="$HOME/.tmux/plugins/tpm"
+    local old_tmux_target=""
 
-    if [[ -d "$tpm_dir" ]]; then
+    # Older revisions stowed the whole ~/.tmux directory into this repository.
+    # Migrate only that known managed link so TPM can own its plugin directory.
+    if [[ -L "$HOME/.tmux" ]]; then
+        old_tmux_target="$(readlink "$HOME/.tmux")"
+        if [[ "$old_tmux_target" == *"dotfiles/tmux/.tmux"* ]]; then
+            rm -- "$HOME/.tmux"
+        fi
+    fi
+
+    mkdir -p "$(dirname "$tpm_dir")"
+
+    if [[ -d "$tpm_dir/.git" ]]; then
         log_success "TPM already installed"
     else
         log_info "Installing Tmux Plugin Manager..."

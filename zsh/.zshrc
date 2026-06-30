@@ -122,14 +122,11 @@ source $ZNAP_LOCATION/znap.zsh  # Start Znap
 # `znap prompt` makes your prompt visible in just 15-40ms!
 znap prompt sindresorhus/pure
 
-# `znap source` starts plugins.
-znap source marlonrichert/zsh-autocomplete
+# Completions
+znap source zsh-users/zsh-completions
 
-# `znap install` adds new commands and completions.
-znap install zsh-users/zsh-completions
-
-# Load mise (version manager) if installed
-command -v mise &>/dev/null && eval "$(mise activate zsh)"
+# Load mise (version manager) if installed - cached via znap
+command -v mise &>/dev/null && znap eval mise 'mise activate zsh'
 
 # Use bat as cat (if installed)
 command -v bat &>/dev/null && alias cat="bat"
@@ -248,19 +245,21 @@ esac
 command -v mise &>/dev/null && mise where tomcat &>/dev/null 2>&1 && export CATALINA_HOME=$(mise where tomcat)
 command -v mise &>/dev/null && mise where java &>/dev/null 2>&1 && export JAVA_HOME=$(mise where java)
 
-# Atuin shell history (if installed)
+# Atuin shell history (if installed) - cached via znap
 [[ -f "$HOME/.atuin/bin/env" ]] && . "$HOME/.atuin/bin/env"
-command -v atuin &>/dev/null && eval "$(atuin init zsh)"
+command -v atuin &>/dev/null && znap eval atuin 'atuin init zsh'
 alias scaffold='bash $HOME/Desktop/cli/scaffold-module-java/scaffold.sh'
 
 
-# Smart directory jumping (zoxide replaces z)
-command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
+# Smart directory jumping (zoxide replaces z) - cached via znap
+command -v zoxide &>/dev/null && znap eval zoxide 'zoxide init zsh'
 
-# Per-directory env vars
-command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
+# Per-directory env vars - cached via znap
+command -v direnv &>/dev/null && znap eval direnv 'direnv hook zsh'
 
-[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
+if [[ "${TERM_PROGRAM:-}" == "kiro" ]] && command -v kiro &>/dev/null; then
+    . "$(kiro --locate-shell-integration-path zsh)"
+fi
 export AWS_PROFILE=sandbox-elitekaycy
 alias minio-setup="mc alias set local http://localhost:9000 minioadmin minioadmin"
 
@@ -283,18 +282,32 @@ alias ta='tmux attach-session -t'    # ta work -> attach to "work"
 alias tl='tmux ls'                   # list sessions
 alias tk='tmux kill-session -t'      # tk work -> kill "work"
 
-# Load Angular CLI autocompletion (if installed)
-command -v ng &>/dev/null && source <(ng completion script)
+# Load Angular CLI autocompletion (if installed) - cached via znap
+command -v ng &>/dev/null && znap eval ng 'ng completion script'
 
 # PVIM Configuration
 export PATH="$HOME/.local/bin:$PATH"
-alias pvim='NVIM_APPNAME=pvim nvim'
-alias pvi='NVIM_APPNAME=pvim nvim'
+alias pvim='NVIM_APPNAME=pvim command nvim'
+alias pvi='NVIM_APPNAME=pvim command nvim'
 # END PVIM
+
+[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
+
+# Optional Grok CLI integration.
+if [[ -d "$HOME/.grok/bin" ]]; then
+    export PATH="$HOME/.grok/bin:$PATH"
+fi
+if [[ -d "$HOME/.grok/completions/zsh" ]]; then
+    fpath=("$HOME/.grok/completions/zsh" $fpath)
+fi
+
+autoload -Uz compinit
+mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+compinit -C -d "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
 
 # === Auto-install ZSH plugins ===
 # zsh-autosuggestions (ghost text suggestions as you type)
 znap source zsh-users/zsh-autosuggestions
 
-# zsh-syntax-highlighting (colors for valid/invalid commands)
+# zsh-syntax-highlighting must be sourced last.
 znap source zsh-users/zsh-syntax-highlighting

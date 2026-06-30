@@ -116,12 +116,13 @@ if ! shopt -oq posix; then
   fi
 fi
 
-. "$HOME/.asdf/asdf.sh"
-. "$HOME/.asdf/completions/asdf.bash"
-
-export PATH=$HOME/.local/bin:$PATH
+export PATH="$HOME/.local/bin:$PATH"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path bash)"
-. "$HOME/.cargo/env"
+if [[ "${TERM_PROGRAM:-}" == "kiro" ]] && command -v kiro >/dev/null; then
+  . "$(kiro --locate-shell-integration-path bash)"
+fi
+
+[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
+[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INSTALL_DIR="$SCRIPT_DIR/install"
@@ -23,19 +23,19 @@ source "$INSTALL_DIR/docker.sh"
 source "$INSTALL_DIR/chrome.sh"
 source "$INSTALL_DIR/languages.sh"
 source "$INSTALL_DIR/nvidia.sh"
-source "$INSTALL_DIR/uninstall.sh"
 source "$INSTALL_DIR/setup.sh"
 
 # Ensure submodules are initialized (for pvim)
 init_submodules() {
     if [[ -f "$SCRIPT_DIR/.gitmodules" ]]; then
         log_info "Initializing git submodules..."
-        git -C "$SCRIPT_DIR" submodule update --init --recursive 2>/dev/null || true
+        git -C "$SCRIPT_DIR" submodule sync --recursive
+        git -C "$SCRIPT_DIR" submodule update --init --recursive
     fi
 }
 
 show_help() {
-    echo "Usage: ./install.sh [component]"
+    echo "Usage: ./install.sh [component] [--dry-run]"
     echo ""
     echo "Components:"
     echo "  (none)     Install everything"
@@ -52,7 +52,8 @@ show_help() {
     echo "  rust       Rust toolchain"
     echo "  zsh        Oh My Zsh, mise, atuin"
     echo "  stow       Symlink dotfiles only"
-    echo "  setup      Run all setup (stow, themes, tmux, pvim)"
+    echo "  check      Validate the repository without changing your system"
+    echo "  setup      Run setup (stow, themes, tmux, pvim)"
     echo "  pvim       Setup pvim (neovim config)"
     echo "  themes     Apply default theme"
     echo "  slack      Install Slack as web app"
@@ -95,12 +96,7 @@ main() {
     # Zsh ecosystem (installs mise)
     install_zsh_ecosystem
 
-    # Backup existing configs, then stow
-    echo ""
-    uninstall
-    echo ""
-    log_info "Setting up configurations..."
-    echo ""
+    # Deploy safely; only conflicting leaf files are backed up.
     stow_dotfiles
     make_executable
 
@@ -128,7 +124,8 @@ main() {
 }
 
 # Handle arguments
-case "$1" in
+case "${1:-}" in
+    "") main ;;
     -h|--help)
         show_help
         ;;
@@ -157,7 +154,14 @@ case "$1" in
         install_zsh_ecosystem
         ;;
     stow)
-        stow_dotfiles && make_executable
+        if [[ "${2:-}" == "--dry-run" ]]; then
+            stow_dotfiles true
+        else
+            stow_dotfiles && make_executable
+        fi
+        ;;
+    check)
+        "$SCRIPT_DIR/scripts/verify.sh"
         ;;
     setup)
         run_setup
@@ -190,6 +194,8 @@ case "$1" in
         setup_wallpapers
         ;;
     *)
-        main
+        log_error "Unknown component: $1"
+        show_help
+        exit 2
         ;;
 esac
