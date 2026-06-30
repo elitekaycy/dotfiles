@@ -125,6 +125,7 @@ deploy_dotfiles() {
         --dir="$DOTFILES_DIR"
         --target="$DOTFILES_TARGET_HOME"
         --restow
+        --ignore='(^|/)undo(/|$)'
         --no-folding
     )
 

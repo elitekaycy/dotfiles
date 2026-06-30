@@ -21,6 +21,7 @@ run_deploy "$fresh_home"
 [[ -L "$fresh_home/.bashrc" ]] || fail "fresh .bashrc was not linked"
 [[ -d "$fresh_home/.config/nvim" && ! -L "$fresh_home/.config/nvim" ]] || fail "--no-folding was not honored"
 [[ -L "$fresh_home/.config/nvim/lazyvim.json" ]] || fail "nested Neovim config was not linked"
+[[ ! -e "$fresh_home/.config/pvim/undo" ]] || fail "pvim runtime undo state was deployed"
 run_deploy "$fresh_home"
 [[ ! -d "$fresh_home/.local/state/dotfiles/backups" ]] || fail "idempotent deploy created a backup"
 
