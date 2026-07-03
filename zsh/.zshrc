@@ -14,6 +14,10 @@
 
 export ZSH="$HOME/.oh-my-zsh"
 
+export PATH="$HOME/.local/bin:$PATH"
+alias pvim='NVIM_APPNAME=pvim nvim'
+alias pvi='NVIM_APPNAME=pvim nvim'
+
 
 
 # Set list of themes to pick from when loading at random
@@ -311,3 +315,11 @@ znap source zsh-users/zsh-autosuggestions
 
 # zsh-syntax-highlighting must be sourced last.
 znap source zsh-users/zsh-syntax-highlighting
+
+source /home/dickson/.config/broot/launcher/bash/br
+
+alias lsb='br'
+
+# >>> Codex installer >>>
+export PATH="/home/dickson/.local/bin:$PATH"
+# <<< Codex installer <<<
