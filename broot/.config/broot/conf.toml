@@ -1,0 +1,7 @@
+[[verbs]]
+invocation = "edit"
+key = "enter"
+apply_to = "file"
+external = 'exec pvim "{file}"'
+from_shell = true
+leave_broot = true

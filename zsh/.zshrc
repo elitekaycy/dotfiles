@@ -318,6 +318,7 @@ znap source zsh-users/zsh-syntax-highlighting
 
 source /home/dickson/.config/broot/launcher/bash/br
 
+alias broot='br'
 alias lsb='br'
 
 # >>> Codex installer >>>
