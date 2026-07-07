@@ -38,7 +38,11 @@ selected=$(build_menu | rofi -dmenu -i -p "Wallpaper" \
 wallpaper_path="$WALLPAPER_DIR/$selected"
 
 if [[ -f "$wallpaper_path" ]]; then
-    feh --bg-fill "$wallpaper_path"
+    if [[ -x "$HOME/.config/i3/wallpaper-setup.sh" ]]; then
+        "$HOME/.config/i3/wallpaper-setup.sh" "$wallpaper_path"
+    else
+        feh --bg-fill "$wallpaper_path"
+    fi
     notify-send "Wallpaper" "Applied: $selected" -i preferences-desktop-wallpaper
 
     # Save current wallpaper for persistence

@@ -11,7 +11,7 @@ shutdown="  Shutdown"
 
 # Show rofi menu
 chosen=$(echo -e "$lock\n$logout\n$suspend\n$hibernate\n$reboot\n$shutdown" | rofi -dmenu -i -p "Power" -theme-str '
-window { width: 200px; }
+window { width: 22em; }
 listview { lines: 6; }
 ')
 
@@ -20,7 +20,7 @@ confirm_action() {
     local action=$1
     local confirm
     confirm=$(echo -e "Yes\nNo" | rofi -dmenu -i -p "Confirm $action?" -theme-str '
-window { width: 200px; }
+window { width: 22em; }
 listview { lines: 2; }
 ')
     [[ "$confirm" == "Yes" ]]

@@ -118,8 +118,13 @@ if [[ -n "${WALLPAPER:-}" ]]; then
     wallpaper_path="$HOME/Pictures/wallpapers/$WALLPAPER"
     if [[ -f "$wallpaper_path" ]]; then
         printf '%s\n' "$wallpaper_path" > "$CONFIG_HOME/current-wallpaper"
-        if [[ "$RELOAD_APPS" == "true" && -n "${DISPLAY:-}" ]] && command -v feh >/dev/null; then
-            feh --bg-fill "$wallpaper_path" >/dev/null 2>&1 || true
+        wallpaper_script="$CONFIG_HOME/i3/wallpaper-setup.sh"
+        if [[ "$RELOAD_APPS" == "true" && -n "${DISPLAY:-}" ]]; then
+            if [[ -x "$wallpaper_script" ]]; then
+                "$wallpaper_script" "$wallpaper_path" >/dev/null 2>&1 || true
+            elif command -v feh >/dev/null; then
+                feh --bg-fill "$wallpaper_path" >/dev/null 2>&1 || true
+            fi
         fi
     else
         log_warn "Wallpaper not found: $wallpaper_path"

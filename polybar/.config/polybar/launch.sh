@@ -1,5 +1,6 @@
-#!/bin/bash
-# Polybar launch script - Multi-monitor support
+#!/usr/bin/env bash
+# Polybar launch script - multi-monitor support
+set -Eeuo pipefail
 
 # Prevent concurrent theme/startup reloads without leaving stale lock files.
 if command -v flock >/dev/null; then
@@ -7,26 +8,53 @@ if command -v flock >/dev/null; then
     flock -n 200 || exit 0
 fi
 
-# Terminate all running polybar instances
-killall -q polybar
-pkill -x polybar 2>/dev/null
+log_dir="${XDG_STATE_HOME:-$HOME/.local/state}/polybar"
+mkdir -p "$log_dir"
 
-# Wait until all processes have been shut down (max 3 seconds)
-timeout=3
-while pgrep -u $UID -x polybar >/dev/null && [ $timeout -gt 0 ]; do
-    sleep 0.5
-    ((timeout--))
+display_setup="${XDG_CONFIG_HOME:-$HOME/.config}/i3/display-setup.sh"
+if [[ -x "$display_setup" ]]; then
+    "$display_setup" >/dev/null 2>&1 || true
+    sleep 0.3
+fi
+
+get_active_monitors() {
+    if command -v polybar >/dev/null; then
+        polybar --list-monitors | cut -d: -f1
+    elif command -v xrandr >/dev/null; then
+        xrandr --query | awk '/ connected/ && /[0-9]+x[0-9]+\+[0-9]+\+[0-9]+/ { print $1 }'
+    else
+        return 1
+    fi
+}
+
+# Terminate this user's running Polybar instances.
+polybar-msg cmd quit >/dev/null 2>&1 || true
+pkill -u "$UID" -x polybar 2>/dev/null || true
+
+# Wait until all processes have been shut down.
+for _ in {1..30}; do
+    pgrep -u "$UID" -x polybar >/dev/null || break
+    sleep 0.1
 done
 
-# Force kill if still running
-pkill -9 -x polybar 2>/dev/null
-sleep 0.2
+if pgrep -u "$UID" -x polybar >/dev/null; then
+    pkill -9 -u "$UID" -x polybar 2>/dev/null || true
+    sleep 0.5
+fi
 
-# Launch polybar on all connected monitors
-if type "xrandr" &>/dev/null; then
-    for m in $(xrandr --query | grep " connected" | cut -d" " -f1); do
-        MONITOR=$m polybar main 2>&1 | tee -a "/tmp/polybar-${m}.log" & disown
-    done
+mapfile -t monitors < <(get_active_monitors | awk 'NF' | sort -u)
+
+if ((${#monitors[@]} == 0)); then
+    (
+        exec 200>&-
+        setsid -f polybar main >>"$log_dir/main.log" 2>&1
+    )
 else
-    polybar main 2>&1 | tee -a /tmp/polybar.log & disown
+    for monitor in "${monitors[@]}"; do
+        (
+            exec 200>&-
+            MONITOR="$monitor" \
+                setsid -f polybar main >>"$log_dir/$monitor.log" 2>&1
+        )
+    done
 fi

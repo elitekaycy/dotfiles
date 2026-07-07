@@ -44,7 +44,7 @@ done <<< "$paired_devices"
 
 # Show rofi menu
 chosen=$(echo -e "$menu" | rofi -dmenu -i -p "Bluetooth" -theme-str '
-window { width: 450px; }
+window { width: 34em; }
 listview { lines: 12; }
 ')
 

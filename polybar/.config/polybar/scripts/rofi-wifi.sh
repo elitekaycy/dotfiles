@@ -40,7 +40,7 @@ done <<< "$networks"
 
 # Show rofi menu
 chosen=$(echo -e "$menu" | rofi -dmenu -i -p "WiFi" -theme-str '
-window { width: 400px; }
+window { width: 32em; }
 listview { lines: 10; }
 ')
 
@@ -82,7 +82,7 @@ case "$chosen" in
             nmcli con up "$ssid"
         else
             # Ask for password
-            password=$(rofi -dmenu -password -p "Password for $ssid")
+            password=$(rofi -dmenu -password -p "Password for $ssid" -theme-str 'window { width: 32em; }')
             if [[ -n "$password" ]]; then
                 nmcli dev wifi connect "$ssid" password "$password"
             fi

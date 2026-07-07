@@ -172,17 +172,13 @@ exec --no-startup-id xset r rate 200 50
 exec --no-startup-id xinput list --name-only | grep -i touchpad | xargs -I {} xinput set-prop "{}" "libinput Natural Scrolling Enabled" 1
 
 # Wallpaper - use saved wallpaper or default
-exec_always --no-startup-id sh -c 'if [ -f "$HOME/.config/current-wallpaper" ]; then feh --bg-fill "$(cat $HOME/.config/current-wallpaper)"; else feh --bg-fill "$HOME/Pictures/wallpapers/tokyo-night.jpg"; fi'
+exec_always --no-startup-id ~/.config/i3/display-setup.sh
+exec_always --no-startup-id ~/.config/i3/wallpaper-setup.sh
 
 
 
 # Startup apps (minimal)
-# 1. Terminal with tmux session (restore or new)
-exec --no-startup-id i3-msg "workspace $ws1; exec kitty -e ~/.config/i3/startup-terminal.sh"
-
-# 2. Browser + Slack
-exec --no-startup-id i3-msg "workspace $ws2; exec firefox"
-exec --no-startup-id i3-msg "workspace $ws2; exec google-chrome --app=https://app.slack.com --class=SlackWebApp --user-data-dir=~/.local/share/webapps/slack-chrome-profile --no-first-run --disable-infobars"
+exec --no-startup-id ~/.config/i3/startup-apps.sh
 
 # Tokyo Night colors
 set $bg         #1a1b26
@@ -198,6 +194,7 @@ set $white      #a9b1d6
 
 # Polybar (replaces i3bar)
 exec_always --no-startup-id ~/.config/polybar/launch.sh
+exec_always --no-startup-id ~/.config/polybar/watch-monitors.sh
 
 # Window border - picom applies rounded corners to match
 for_window [class=".*"] border pixel 2
@@ -207,4 +204,3 @@ client.focused          $blue    $blue    $bg      $cyan     $blue
 client.unfocused        $bg      $bg      $white   $bg       $bg
 client.focused_inactive $black   $black   $white   $black    $black
 client.urgent           $red     $red     $bg      $red      $red
-

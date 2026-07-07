@@ -12,6 +12,9 @@ if [[ -n "$wifi_status" ]]; then
     else
         icon="󰤟"
     fi
+    if [[ ${#wifi_status} -gt 12 ]]; then
+        wifi_status="${wifi_status:0:12}..."
+    fi
     echo "$icon $wifi_status"
     exit 0
 fi
@@ -19,7 +22,7 @@ fi
 # Check for Ethernet
 eth_status=$(ip addr show 2>/dev/null | grep -E "enp|eth" | grep "state UP")
 if [[ -n "$eth_status" ]]; then
-    echo "󰈀 Connected"
+    echo "󰈀 LAN"
     exit 0
 fi
 
