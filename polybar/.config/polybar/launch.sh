@@ -27,6 +27,48 @@ get_active_monitors() {
     fi
 }
 
+get_monitor_width() {
+    local monitor="$1"
+
+    if command -v polybar >/dev/null; then
+        polybar --list-monitors | awk -v monitor="$monitor" '
+            $1 == monitor ":" {
+                split($2, dimensions, "x")
+                print dimensions[1]
+                exit
+            }
+        '
+    elif command -v xrandr >/dev/null; then
+        xrandr --query | awk -v monitor="$monitor" '
+            $1 == monitor && / connected/ {
+                for (i = 1; i <= NF; i++) {
+                    if ($i ~ /^[0-9]+x[0-9]+\+[0-9]+\+[0-9]+$/) {
+                        split($i, dimensions, "x")
+                        print dimensions[1]
+                        exit
+                    }
+                }
+            }
+        '
+    fi
+}
+
+get_bar_geometry() {
+    local monitor="$1"
+    local monitor_width
+    local bar_width
+    local bar_offset
+
+    monitor_width="$(get_monitor_width "$monitor")"
+    if [[ "$monitor_width" =~ ^[0-9]+$ && "$monitor_width" -gt 0 ]]; then
+        bar_width=$((monitor_width * 48 / 100))
+        bar_offset=$(((monitor_width - bar_width) / 2))
+        printf '%s %s\n' "$bar_width" "$bar_offset"
+    else
+        printf '48%% 26%%\n'
+    fi
+}
+
 # Terminate this user's running Polybar instances.
 polybar-msg cmd quit >/dev/null 2>&1 || true
 pkill -u "$UID" -x polybar 2>/dev/null || true
@@ -51,9 +93,10 @@ if ((${#monitors[@]} == 0)); then
     )
 else
     for monitor in "${monitors[@]}"; do
+        read -r bar_width bar_offset < <(get_bar_geometry "$monitor")
         (
             exec 200>&-
-            MONITOR="$monitor" \
+            MONITOR="$monitor" BAR_WIDTH="$bar_width" BAR_OFFSET_X="$bar_offset" \
                 setsid -f polybar main >>"$log_dir/$monitor.log" 2>&1
         )
     done

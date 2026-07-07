@@ -10,6 +10,7 @@ font pango:JetBrains Mono Nerd Font 10
 # Gaps configuration
 gaps inner 10
 gaps outer 4 
+gaps bottom 56
 
 smart_gaps off
 

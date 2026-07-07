@@ -17,31 +17,34 @@ magenta = {{MAGENTA}}
 
 [bar/main]
 monitor = ${env:MONITOR:}
-width = 100%
-height = 26
+width = ${env:BAR_WIDTH:48%}
+height = 42
 dpi = 96
-radius = 0
-offset-x = 0
-offset-y = 0
+radius = 21
+offset-x = ${env:BAR_OFFSET_X:26%}
+offset-y = 10
+bottom = true
+fixed-center = true
+override-redirect = true
 
 background = ${colors.background}
 foreground = ${colors.foreground}
 
 line-size = 2
 
-border-size = 0
+border-size = 6
 border-color = #00000000
 
-padding-left = 0
-padding-right = 1
+padding-left = 2
+padding-right = 2
 
-module-margin = 0
+module-margin = 1
 
-separator = " "
+separator = ""
 separator-foreground = ${colors.disabled}
 
-font-0 = "JetBrainsMono Nerd Font:size=10;2"
-font-1 = "JetBrainsMono Nerd Font:size=12;2"
+font-0 = "JetBrainsMono Nerd Font:size=10;3"
+font-1 = "JetBrainsMono Nerd Font:size=12;3"
 
 modules-left = i3
 modules-center = date
@@ -51,6 +54,7 @@ cursor-click = pointer
 cursor-scroll = ns-resize
 
 enable-ipc = true
+enable-struts = false
 
 wm-restack = i3
 
@@ -65,43 +69,48 @@ show-urgent = true
 strip-wsnumbers = true
 index-sort = true
 
-label-mode = %mode%
+label-mode = " 󰉋 %mode% "
 label-mode-padding = 1
 label-mode-background = ${colors.alert}
 
-label-focused = %name%
-label-focused-foreground = ${colors.background}
-label-focused-background = ${colors.primary}
+label-focused = " 󰉋 %name% "
+label-focused-foreground = ${colors.primary}
 label-focused-underline = ${colors.primary}
-label-focused-padding = 1
+label-focused-padding = 0
 
-label-unfocused = %name%
-label-unfocused-padding = 1
+label-unfocused = " %index% "
+label-unfocused-foreground = ${colors.disabled}
+label-unfocused-padding = 0
 
-label-visible = %name%
+label-visible = " %index% "
+label-visible-foreground = ${colors.secondary}
 label-visible-underline = ${colors.secondary}
-label-visible-padding = 1
+label-visible-padding = 0
 
-label-urgent = %name%
-label-urgent-background = ${colors.alert}
-label-urgent-padding = 1
+label-urgent = " %index% "
+label-urgent-foreground = ${colors.alert}
+label-urgent-underline = ${colors.alert}
+label-urgent-padding = 0
 
 [module/date]
 type = internal/date
 interval = 30
 
-date = %a %d
+date = %A %b %d
 time = %I:%M %p
 
-label = %date% %time%
+label = " 󰥔 %date% %time% "
 label-foreground = ${colors.foreground}
+click-left = sh -c 'notify-send "$(date "+%A, %B %d")" "$(date "+%I:%M %p")"'
 
 [module/network]
 type = custom/script
 exec = ~/.config/polybar/scripts/network.sh
 interval = 5
 click-left = ~/.config/polybar/scripts/rofi-wifi.sh
-label-maxlen = 16
+format = <label>
+format-padding = 1
+label-maxlen = 12
 label-foreground = ${colors.cyan}
 
 [module/bluetooth]
@@ -109,25 +118,33 @@ type = custom/script
 exec = ~/.config/polybar/scripts/bluetooth.sh
 interval = 5
 click-left = ~/.config/polybar/scripts/rofi-bluetooth.sh
+format = <label>
+format-padding = 1
 label-maxlen = 4
 label-foreground = ${colors.primary}
 
 [module/pulseaudio]
 type = internal/pulseaudio
+use-ui-max = false
 
 format-volume = <ramp-volume> <label-volume>
 format-volume-foreground = ${colors.magenta}
+format-volume-padding = 1
 
 label-volume = %percentage%%
 
 label-muted = 󰝟
 label-muted-foreground = ${colors.disabled}
+label-muted-padding = 1
 
 ramp-volume-0 = 󰕿
 ramp-volume-1 = 󰖀
 ramp-volume-2 = 󰕾
 
+click-left = pactl set-sink-mute @DEFAULT_SINK@ toggle
 click-right = pavucontrol &
+scroll-up = pactl set-sink-volume @DEFAULT_SINK@ +5%
+scroll-down = pactl set-sink-volume @DEFAULT_SINK@ -5%
 
 [module/battery]
 type = internal/battery
@@ -139,15 +156,19 @@ poll-interval = 5
 
 format-charging = <animation-charging> <label-charging>
 format-charging-foreground = ${colors.green}
+format-charging-padding = 1
 
 format-discharging = <ramp-capacity> <label-discharging>
 format-discharging-foreground = ${colors.yellow}
+format-discharging-padding = 1
 
 format-full =  <label-full>
 format-full-foreground = ${colors.green}
+format-full-padding = 1
 
 format-low = <animation-low> <label-low>
 format-low-foreground = ${colors.alert}
+format-low-padding = 1
 
 label-charging = %percentage%%
 label-discharging = %percentage%%
@@ -173,7 +194,7 @@ animation-low-framerate = 500
 
 [module/power]
 type = custom/text
-format = "⏻"
+format = " ⏻ "
 format-foreground = ${colors.alert}
 click-left = ~/.config/polybar/scripts/rofi-power.sh
 
