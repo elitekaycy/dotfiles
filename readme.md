@@ -115,6 +115,20 @@ wallpapers/
 
 `./install.sh wallpapers` copies the tree to `~/Pictures/wallpapers/` additively, so machine-local extras dropped there survive updates. `Mod+Shift+b` lists everything; `Mod+Ctrl+Space` cycles the current theme's set.
 
+## Secrets
+
+API keys and tokens live in the GNOME keyring (already running, unlocked by your login, encrypted on disk — nothing to set up):
+
+```bash
+dots-secret set aws/sandbox          # prompts for the value (or pipe it in)
+dots-secret get aws/sandbox          # print
+dots-secret copy aws/sandbox         # clipboard, cleared after 30s
+dots-secret ls | find aws | rm name  # list, search, delete
+export OPENAI_API_KEY="$(dots-secret get openai)"   # in scripts / .envrc
+```
+
+Search `secret` in `Mod+Alt+Space` to pick one and copy it. Names can use `/` for grouping.
+
 ## Dark mode and browser
 
 Everything is dark by default: GTK 3/4 (`gtk/` package: Adwaita-dark, Papirus-Dark icons), the desktop portal (`portals.conf` → gtk, which is how browsers learn the colour scheme under i3), and every Zen/Firefox profile (`dots-darkmode` writes a `user.js` forcing dark UI *and* dark web content). Re-run `dots-darkmode` after creating a new browser profile.

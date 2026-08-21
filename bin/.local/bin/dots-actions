@@ -34,6 +34,7 @@ ACTIONS=(
     "󰅇  Screenshot to clipboard|capture flameshot copy|$BIN_DIR/dots-screenshot clip"
     "󰅇  Clipboard history|paste greenclip|rofi -modi clipboard:greenclip\\ print -show clipboard"
     "󰌌  Keybindings|keys shortcuts help|$BIN_DIR/dots-keys"
+    "󰌆  Secrets: copy|password key token keyring vault api|$BIN_DIR/dots-secret menu"
     "󰍛  System monitor|btop cpu memory processes top|kitty -e btop"
     "󰍹  Monitors: arrange|display screen hdmi external arandr layout dual|$BIN_DIR/dots-monitors arrange"
     "󰍹  Monitors: save layout|display screen hdmi external remember dual|$BIN_DIR/dots-monitors save"
