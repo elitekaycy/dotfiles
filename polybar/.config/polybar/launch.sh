@@ -27,9 +27,10 @@ get_active_monitors() {
     fi
 }
 
-# Terminate this user's running Polybar instances.
+# Terminate this user's running Polybar instances and their tailing scripts.
 polybar-msg cmd quit >/dev/null 2>&1 || true
 pkill -u "$UID" -x polybar 2>/dev/null || true
+pkill -u "$UID" -f 'polybar/scripts/workspaces.sh' 2>/dev/null || true
 
 for _ in {1..30}; do
     pgrep -u "$UID" -x polybar >/dev/null || break

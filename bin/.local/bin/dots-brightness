@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Screen brightness via brightnessctl, with a notification.
+#
+#   dots-brightness up | down | <percent>
+set -Eeuo pipefail
+
+case "${1:-}" in
+    up) brightnessctl -q set 10%+ ;;
+    down) brightnessctl -q set 10%- ;;
+    [0-9]*) brightnessctl -q set "${1%\%}%" ;;
+    *) echo "Usage: dots-brightness up|down|<percent>" >&2; exit 2 ;;
+esac
+
+level="$(brightnessctl -m | cut -d, -f4)"
+command -v notify-send >/dev/null && notify-send -r 9101 -t 1500 "Brightness" "$level" -h "int:value:${level%\%}" || true

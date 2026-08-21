@@ -52,32 +52,14 @@ format-padding = 2
 click-left = ~/.local/bin/dots-menu
 click-right = kitty
 
+; 1-5 always visible (dim when empty), 6-10 when in use, dot = focused.
+; Event driven via i3 IPC; click a number to switch.
 [module/workspaces]
-type = internal/i3
-pin-workspaces = true
-show-urgent = true
-index-sort = true
-enable-scroll = false
-
-label-focused = 󱓻
-label-focused-foreground = ${colors.foreground}
-label-focused-padding = 1
-
-label-unfocused = %index%
-label-unfocused-foreground = ${colors.dim}
-label-unfocused-padding = 1
-
-label-visible = %index%
-label-visible-foreground = ${colors.foreground}
-label-visible-padding = 1
-
-label-urgent = %index%
-label-urgent-foreground = ${colors.alert}
-label-urgent-padding = 1
-
-label-mode = %mode%
-label-mode-foreground = ${colors.alert}
-label-mode-padding = 1
+type = custom/script
+exec = ~/.config/polybar/scripts/workspaces.sh
+tail = true
+format = <label>
+format-padding = 0
 
 ;==========================================================
 ;   Center

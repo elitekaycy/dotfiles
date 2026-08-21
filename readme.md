@@ -59,7 +59,10 @@ All live in `bin/.local/bin/` and are on `PATH` as `~/.local/bin/dots-*`.
 
 | Command | Does |
 | --- | --- |
-| `dots-menu` | Rofi hub: Apps · Theme · Wallpaper · Session · Keybindings · WiFi · Bluetooth · Screenshot · Clipboard · Lock · Power |
+| `dots-menu` | **The search.** Every system action and every app in one rofi list. Type `shutdown`, `brightness`, `wifi`, `volume`, `theme`, `firefox`… Enter runs it. Hidden keywords match too (`poweroff`, `dim`, `screen`, `sleep`) |
+| `dots-actions` | The action list behind `dots-menu` (rofi script mode); add a row there to add a searchable action |
+| `dots-brightness up\|down\|<percent>` | Screen brightness with an on-screen bar |
+| `dots-power [lock\|logout\|suspend\|hibernate\|reboot\|shutdown]` | Power menu, or jump straight to one action (destructive ones confirm) |
 | `dots-theme-menu` | Rofi theme picker; type a name or `dark` / `light` to filter |
 | `dots-theme-set [--no-reload] <id>` | Render + apply a theme (`dots-theme-set nord`) |
 | `dots-theme-next` | Cycle to the next theme |
@@ -72,7 +75,6 @@ All live in `bin/.local/bin/` and are on `PATH` as `~/.local/bin/dots-*`.
 | `dots-wifi` / `dots-bluetooth` | Rofi network menus (also opened by clicking the Polybar modules) |
 | `dots-screenshot area\|full\|clip` | Flameshot |
 | `dots-lock` | i3lock in the theme background colour |
-| `dots-power` | Lock · Logout · Suspend · Hibernate · Reboot · Shutdown |
 
 ## Themes
 
@@ -123,7 +125,7 @@ wallpapers/
 | --- | --- |
 | `Mod+Return` | Kitty |
 | `Mod+d` | Rofi app launcher |
-| `Mod+Alt+Space` | **Main menu hub** (`dots-menu`) |
+| `Mod+Alt+Space` | **Search everything** — actions + apps (`dots-menu`) |
 | `Mod+v` | Clipboard history (greenclip) |
 | `Mod+Shift+/` | Keybinding reference |
 | `Mod+z` / `Mod+b` | Zen browser / Firefox |
@@ -166,7 +168,7 @@ wallpapers/
 | `Mod+Shift+s` / `Mod+Shift+f` / `Mod+Shift+c` | Screenshot area / full / area→clipboard |
 | `XF86 brightness / volume / media keys` | brightnessctl, pactl, playerctl |
 
-Polybar (icons only, left → right): `≡` menu (click: `dots-menu`, right-click: Kitty) · workspaces (dot = active) · clock (click: `dots-menu`) · tray · bluetooth (`dots-bluetooth`) · wifi (`dots-wifi`) · audio (click: `pavucontrol`, right-click: mute, scroll: volume) · cpu (`btop`) · battery (`dots-power`).
+Polybar (icons only, left → right): `≡` menu (click: `dots-menu`, right-click: Kitty) · workspaces 1–5 always, 6–10 when used (dot = active, click to switch) · clock (click: `dots-menu`) · tray · bluetooth (`dots-bluetooth`) · wifi (`dots-wifi`) · audio (click: `pavucontrol`, right-click: mute, scroll: volume) · cpu (`btop`) · battery (`dots-power`).
 
 ### tmux (prefix `Ctrl+g`)
 

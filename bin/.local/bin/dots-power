@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# Rofi power menu.
+# Power menu. With an argument, skip straight to that action (still confirms
+# the destructive ones).
+#
+#   dots-power [lock|logout|suspend|hibernate|reboot|shutdown]
 set -Eeuo pipefail
 
 BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -14,13 +17,19 @@ confirm() {
     [[ "$(printf 'Yes\nNo\n' | menu "Confirm $1?" 2)" == "Yes" ]]
 }
 
-chosen="$(printf '%s\n' "󰌾  Lock" "󰍃  Logout" "󰤄  Suspend" "󰒲  Hibernate" "󰜉  Reboot" "󰐥  Shutdown" | menu "Power" 6)" || exit 0
+action="${1:-}"
+if [[ -z "$action" ]]; then
+    chosen="$(printf '%s\n' "󰌾  Lock" "󰍃  Logout" "󰤄  Suspend" "󰒲  Hibernate" "󰜉  Reboot" "󰐥  Shutdown" | menu "Power" 6)" || exit 0
+    action="${chosen##*  }"
+    action="${action,,}"
+fi
 
-case "${chosen##*  }" in
-    Lock)      "$BIN_DIR/dots-lock" ;;
-    Logout)    confirm logout && i3-msg exit ;;
-    Suspend)   "$BIN_DIR/dots-lock" && systemctl suspend ;;
-    Hibernate) "$BIN_DIR/dots-lock" && systemctl hibernate ;;
-    Reboot)    confirm reboot && systemctl reboot ;;
-    Shutdown)  confirm shutdown && systemctl poweroff ;;
+case "$action" in
+    lock)      "$BIN_DIR/dots-lock" ;;
+    logout)    confirm logout && i3-msg exit ;;
+    suspend)   "$BIN_DIR/dots-lock" && systemctl suspend ;;
+    hibernate) "$BIN_DIR/dots-lock" && systemctl hibernate ;;
+    reboot)    confirm reboot && systemctl reboot ;;
+    shutdown)  confirm shutdown && systemctl poweroff ;;
+    *) echo "Usage: dots-power [lock|logout|suspend|hibernate|reboot|shutdown]" >&2; exit 2 ;;
 esac

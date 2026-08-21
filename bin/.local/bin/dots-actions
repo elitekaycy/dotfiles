@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Rofi script mode listing every system action; used by dots-menu.
+# Each row carries hidden search keywords (rofi "meta") so e.g. typing
+# "poweroff", "dim" or "screen" still finds the right action.
+#
+#   rofi -modi "actions:dots-actions" -show actions
+set -Eeuo pipefail
+
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# label | keywords | command
+ACTIONS=(
+    "󰏘  Theme: pick|colors colour scheme dark light|$BIN_DIR/dots-theme-menu"
+    "󰒭  Theme: next|colors cycle|$BIN_DIR/dots-theme-next"
+    "󰸉  Wallpaper: pick|background image|$BIN_DIR/dots-bg-menu"
+    "󰒭  Wallpaper: next|background cycle|$BIN_DIR/dots-bg-next"
+    "󰖩  WiFi|network internet wireless connect|$BIN_DIR/dots-wifi"
+    "󰂯  Bluetooth|headphones pair connect|$BIN_DIR/dots-bluetooth"
+    "󰃠  Brightness up|screen light dim brighter +10|$BIN_DIR/dots-brightness up"
+    "󰃞  Brightness down|screen light dim darker -10 decrease|$BIN_DIR/dots-brightness down"
+    "󰃟  Brightness 100%|screen light max full|$BIN_DIR/dots-brightness 100"
+    "󰃝  Brightness 50%|screen light half|$BIN_DIR/dots-brightness 50"
+    "󰃜  Brightness 20%|screen light low night|$BIN_DIR/dots-brightness 20"
+    "󰕾  Volume up|sound audio louder +5|pactl set-sink-volume @DEFAULT_SINK@ +5%"
+    "󰖀  Volume down|sound audio quieter -5|pactl set-sink-volume @DEFAULT_SINK@ -5%"
+    "󰝟  Volume mute toggle|sound audio silence|pactl set-sink-mute @DEFAULT_SINK@ toggle"
+    "󰕿  Audio settings|sound output input pavucontrol|pavucontrol"
+    "󰆍  Session: main|tmux terminal|kitty -e $BIN_DIR/dots-session main"
+    "󰆍  Session: work|tmux terminal|kitty -e $BIN_DIR/dots-session work"
+    "󰆍  Session: scalestash|tmux terminal project|kitty -e $BIN_DIR/dots-session scalestash"
+    "󰆍  Session: pick|tmux terminal list|$BIN_DIR/dots-session --menu"
+    "󰩭  Screenshot area|capture flameshot region|$BIN_DIR/dots-screenshot area"
+    "󰹑  Screenshot full|capture flameshot screen|$BIN_DIR/dots-screenshot full"
+    "󰅇  Screenshot to clipboard|capture flameshot copy|$BIN_DIR/dots-screenshot clip"
+    "󰅇  Clipboard history|paste greenclip|rofi -modi clipboard:greenclip\\ print -show clipboard"
+    "󰌌  Keybindings|keys shortcuts help|$BIN_DIR/dots-keys"
+    "󰍛  System monitor|btop cpu memory processes top|kitty -e btop"
+    "󰑓  Reload i3|restart wm|i3-msg reload"
+    "󰌾  Lock|screen lock|$BIN_DIR/dots-lock"
+    "󰍃  Logout|exit i3 sign out|$BIN_DIR/dots-power logout"
+    "󰤄  Suspend|sleep|$BIN_DIR/dots-power suspend"
+    "󰒲  Hibernate|sleep disk|$BIN_DIR/dots-power hibernate"
+    "󰜉  Reboot|restart|$BIN_DIR/dots-power reboot"
+    "󰐥  Shutdown|poweroff power off turn off halt|$BIN_DIR/dots-power shutdown"
+)
+
+if [[ $# -eq 0 ]]; then
+    printf '\0no-custom\x1ftrue\n'
+    for entry in "${ACTIONS[@]}"; do
+        IFS='|' read -r label keywords _ <<< "$entry"
+        printf '%s\0meta\x1f%s\n' "$label" "$keywords"
+    done
+    exit 0
+fi
+
+for entry in "${ACTIONS[@]}"; do
+    IFS='|' read -r label _ command <<< "$entry"
+    if [[ "$label" == "$1" ]]; then
+        # Detach so rofi can close before the action (which may open its own rofi) runs.
+        setsid -f sh -c "sleep 0.15; $command" >/dev/null 2>&1 </dev/null
+        break
+    fi
+done
