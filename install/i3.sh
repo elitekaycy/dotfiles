@@ -32,8 +32,7 @@ install_i3() {
                 playerctl \
                 xss-lock \
                 polybar \
-                papirus-icon-theme \
-                libsecret-tools
+                papirus-icon-theme
             ;;
         fedora)
             pkg_install \
@@ -60,8 +59,7 @@ install_i3() {
                 playerctl \
                 xss-lock \
                 polybar \
-                papirus-icon-theme \
-                libsecret-tools
+                papirus-icon-theme
             ;;
         arch)
             pkg_install \
@@ -88,8 +86,7 @@ install_i3() {
                 playerctl \
                 xss-lock \
                 polybar \
-                papirus-icon-theme \
-                libsecret-tools
+                papirus-icon-theme
             ;;
     esac
 

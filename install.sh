@@ -23,6 +23,7 @@ source "$INSTALL_DIR/chrome.sh"
 source "$INSTALL_DIR/languages.sh"
 source "$INSTALL_DIR/nvidia.sh"
 source "$INSTALL_DIR/zen.sh"
+source "$INSTALL_DIR/pass.sh"
 source "$INSTALL_DIR/setup.sh"
 
 # Ensure submodules are initialized (for pvim)
@@ -61,6 +62,7 @@ show_help() {
     echo "  wallpapers Copy wallpapers"
     echo "  zen        Zen browser policy (Vimium) when zen is installed"
     echo "  darkmode   Force dark mode for GTK and Zen/Firefox profiles"
+    echo "  pass       Secrets: pass + GPG key + git-backed store (dots-secret)"
     echo ""
 }
 
@@ -113,6 +115,7 @@ main() {
     setup_pvim
     set_zsh_default
     install_zen_policy
+    install_pass
     "$HOME/.local/bin/dots-darkmode"
 
     echo ""
@@ -202,6 +205,9 @@ case "${1:-}" in
         ;;
     darkmode)
         "$HOME/.local/bin/dots-darkmode"
+        ;;
+    pass)
+        install_pass
         ;;
     *)
         log_error "Unknown component: $1"
