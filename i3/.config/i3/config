@@ -193,5 +193,5 @@ exec --no-startup-id ~/.config/i3/startup-apps.sh
 exec_always --no-startup-id ~/.config/polybar/launch.sh
 exec_always --no-startup-id ~/.config/polybar/watch-monitors.sh
 
-# Window border - green on the focused window (theme.conf); picom rounds the corners
-for_window [class=".*"] border pixel 3
+# Window border - theme primary colour on the focused window (theme.conf); picom rounds the corners
+for_window [class=".*"] border pixel 2

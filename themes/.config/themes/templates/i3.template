@@ -17,7 +17,7 @@ set $primary    {{PRIMARY}}
 set $secondary  {{SECONDARY}}
 
 #                       border      bg          text     indicator   child_border
-client.focused          $green      $green      $bg      $green      $green
+client.focused          $primary    $primary    $bg      $primary    $primary
 client.focused_inactive $bg_alt     $bg_alt     $white   $bg_alt     $bg_alt
 client.unfocused        $bg         $bg         $fg_dim  $bg         $bg
 client.urgent           $red        $red        $bg      $red        $red

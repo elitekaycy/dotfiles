@@ -78,7 +78,7 @@ All live in `bin/.local/bin/` and are on `PATH` as `~/.local/bin/dots-*`.
 
 ## Themes
 
-Available: `catppuccin-latte` `catppuccin-mocha` `dracula` `gruvbox-dark` `gruvbox-light` `nord` `nord-light` `tokyo-night` `tokyo-night-light`
+Available: `matte-black` (darkest, Omarchy palette) `tokyo-night` `tokyo-night-light` `catppuccin-mocha` `catppuccin-latte` `dracula` `gruvbox-dark` `gruvbox-light` `nord` `nord-light`
 
 What one theme drives:
 
