@@ -7,7 +7,7 @@ BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 exec rofi -show combi \
     -modi "combi" \
-    -combi-modi "actions:$BIN_DIR/dots-actions,drun" \
+    -combi-modi "drun,actions:$BIN_DIR/dots-actions" \
     -combi-hide-mode-prefix \
     -display-combi "󰍜 " \
     -theme-str 'window { width: 34em; }' \
