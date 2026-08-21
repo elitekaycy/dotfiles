@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # Create or attach a named tmux session.
 #
-#   dots-session <name>     main | work | scalestash | any existing session
+#   dots-session <name>     main | work | scalestash | qkt | any existing session
 #   dots-session --menu     pick one in rofi and open it in kitty
 set -Eeuo pipefail
 
 BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCALE_ROOT="$HOME/Desktop/scalestash-aws"
+QKT_ROOT="$HOME/Desktop/qkt"
 
 window() {
     # window <session> <name> <dir> [command]
@@ -46,11 +47,23 @@ session_scalestash() {
     tmux select-window -t scalestash:scalestash
 }
 
+session_qkt() {
+    tmux has-session -t qkt 2>/dev/null && return 0
+    [[ -d "$QKT_ROOT" ]] || { echo "dots-session: $QKT_ROOT not found" >&2; QKT_ROOT="$HOME"; }
+    window qkt qkt "$QKT_ROOT/qkt" "pvim ."
+    window qkt insights "$QKT_ROOT/qkt-insights" "pvim ."
+    window qkt research "$QKT_ROOT/qkt-research-lab" "pvim ."
+    window qkt mt5 "$QKT_ROOT/mt5-gateway" "pvim ."
+    window qkt script "$QKT_ROOT"
+    window qkt claude "$QKT_ROOT"
+    tmux select-window -t qkt:qkt
+}
+
 if [[ "${1:-}" == "--menu" ]]; then
-    rows=("󰆍  main" "󰆍  work" "󰆍  scalestash")
+    rows=("󰆍  main" "󰆍  work" "󰆍  scalestash" "󰆍  qkt")
     while IFS= read -r existing; do
         [[ -n "$existing" ]] || continue
-        case "$existing" in main|work|scalestash) continue ;; esac
+        case "$existing" in main|work|scalestash|qkt) continue ;; esac
         rows+=("󰆍  $existing")
     done < <(tmux list-sessions -F '#S' 2>/dev/null || true)
     chosen="$(printf '%s\n' "${rows[@]}" | rofi -dmenu -i -p "Session" -no-custom \
@@ -65,6 +78,7 @@ case "$name" in
     main) session_main ;;
     work) session_work ;;
     scalestash) session_scalestash ;;
+    qkt) session_qkt ;;
     *) tmux has-session -t "$name" 2>/dev/null || tmux new-session -d -s "$name" ;;
 esac
 
