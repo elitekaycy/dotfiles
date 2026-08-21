@@ -127,6 +127,7 @@ fi
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 [[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
 
-source /home/dickson/.config/broot/launcher/bash/br
-
-alias broot='br'
+if [[ -f "$HOME/.config/broot/launcher/bash/br" ]]; then
+    source "$HOME/.config/broot/launcher/bash/br"
+    alias broot='br'
+fi

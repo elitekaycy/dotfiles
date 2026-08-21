@@ -6,7 +6,7 @@
 set -Eeuo pipefail
 
 BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCALE_ROOT="$HOME/Desktop/project/scale-app-projects"
+SCALE_ROOT="$HOME/Desktop/scalestash-aws"
 
 window() {
     # window <session> <name> <dir> [command]
@@ -38,13 +38,12 @@ session_work() {
 
 session_scalestash() {
     tmux has-session -t scalestash 2>/dev/null && return 0
-    window scalestash scalestash-landing "$SCALE_ROOT/scale-app-api-landing" "pvim ."
-    window scalestash scalestash-agentic-api "$SCALE_ROOT/scale-app-api-agentic/scale-app-api/scale-app-api" "pvim ."
-    window scalestash scalestash-agentic-web "$SCALE_ROOT/scale-app-web-agentic/scale-app-frontend" "pvim ."
+    [[ -d "$SCALE_ROOT" ]] || { echo "dots-session: $SCALE_ROOT not found" >&2; SCALE_ROOT="$HOME"; }
+    window scalestash scalestash "$SCALE_ROOT" "pvim ."
     window scalestash docs "$SCALE_ROOT"
     window scalestash script "$SCALE_ROOT"
     window scalestash claude-research "$SCALE_ROOT"
-    tmux select-window -t scalestash:scalestash-landing
+    tmux select-window -t scalestash:scalestash
 }
 
 if [[ "${1:-}" == "--menu" ]]; then
