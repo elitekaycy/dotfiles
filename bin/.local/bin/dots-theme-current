@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Print the selected theme id.
+cat "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/theme" 2>/dev/null || echo tokyo-night

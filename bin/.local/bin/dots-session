@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# Create or attach a named tmux session.
+#
+#   dots-session <name>     main | work | scalestash | any existing session
+#   dots-session --menu     pick one in rofi and open it in kitty
+set -Eeuo pipefail
+
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCALE_ROOT="$HOME/Desktop/project/scale-app-projects"
+
+window() {
+    # window <session> <name> <dir> [command]
+    local session="$1" name="$2" dir="$3" cmd="${4:-}"
+    if tmux list-windows -t "$session" -F '#W' 2>/dev/null | grep -qx "$name"; then
+        return 0
+    fi
+    if [[ -z "$(tmux list-windows -t "$session" -F '#W' 2>/dev/null)" ]]; then
+        tmux new-session -d -s "$session" -n "$name" -c "$dir"
+    else
+        tmux new-window -t "$session" -n "$name" -c "$dir"
+    fi
+    [[ -n "$cmd" ]] && tmux send-keys -t "$session:$name" "$cmd" C-m
+}
+
+session_main() {
+    tmux has-session -t main 2>/dev/null || tmux new-session -d -s main -c "$HOME"
+}
+
+session_work() {
+    tmux has-session -t work 2>/dev/null && return 0
+    local dir="$PWD"
+    window work work "$dir" "pvim ."
+    window work docs "$dir"
+    window work script "$dir"
+    window work claude-research "$dir"
+    tmux select-window -t work:work
+}
+
+session_scalestash() {
+    tmux has-session -t scalestash 2>/dev/null && return 0
+    window scalestash scalestash-landing "$SCALE_ROOT/scale-app-api-landing" "pvim ."
+    window scalestash scalestash-agentic-api "$SCALE_ROOT/scale-app-api-agentic/scale-app-api/scale-app-api" "pvim ."
+    window scalestash scalestash-agentic-web "$SCALE_ROOT/scale-app-web-agentic/scale-app-frontend" "pvim ."
+    window scalestash docs "$SCALE_ROOT"
+    window scalestash script "$SCALE_ROOT"
+    window scalestash claude-research "$SCALE_ROOT"
+    tmux select-window -t scalestash:scalestash-landing
+}
+
+if [[ "${1:-}" == "--menu" ]]; then
+    rows=("  main" "  work" "  scalestash")
+    while IFS= read -r existing; do
+        [[ -n "$existing" ]] || continue
+        case "$existing" in main|work|scalestash) continue ;; esac
+        rows+=("  $existing")
+    done < <(tmux list-sessions -F '#S' 2>/dev/null || true)
+    chosen="$(printf '%s\n' "${rows[@]}" | rofi -dmenu -i -p "Session" -no-custom \
+        -theme-str 'window { width: 22em; }' \
+        -theme-str "listview { lines: ${#rows[@]}; }")" || exit 0
+    [[ -n "$chosen" ]] || exit 0
+    exec kitty -e "$BIN_DIR/dots-session" "${chosen##*  }"
+fi
+
+name="${1:-main}"
+case "$name" in
+    main) session_main ;;
+    work) session_work ;;
+    scalestash) session_scalestash ;;
+    *) tmux has-session -t "$name" 2>/dev/null || tmux new-session -d -s "$name" ;;
+esac
+
+if [[ -n "${TMUX:-}" ]]; then
+    exec tmux switch-client -t "$name"
+fi
+exec tmux attach-session -t "$name"

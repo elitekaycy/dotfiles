@@ -107,7 +107,7 @@ click-left = sh -c 'notify-send "$(date "+%A, %B %d")" "$(date "+%I:%M %p")"'
 type = custom/script
 exec = ~/.config/polybar/scripts/network.sh
 interval = 5
-click-left = ~/.config/polybar/scripts/rofi-wifi.sh
+click-left = ~/.local/bin/dots-wifi
 format = <label>
 format-padding = 1
 label-maxlen = 12
@@ -117,7 +117,7 @@ label-foreground = ${colors.cyan}
 type = custom/script
 exec = ~/.config/polybar/scripts/bluetooth.sh
 interval = 5
-click-left = ~/.config/polybar/scripts/rofi-bluetooth.sh
+click-left = ~/.local/bin/dots-bluetooth
 format = <label>
 format-padding = 1
 label-maxlen = 4
@@ -196,7 +196,7 @@ animation-low-framerate = 500
 type = custom/text
 format = " ⏻ "
 format-foreground = ${colors.alert}
-click-left = ~/.config/polybar/scripts/rofi-power.sh
+click-left = ~/.local/bin/dots-power
 
 [settings]
 screenchange-reload = true

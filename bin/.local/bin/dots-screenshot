@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Flameshot wrapper used by the menu.
+#
+#   dots-screenshot area | full | clip
+set -Eeuo pipefail
+
+case "${1:-area}" in
+    area) exec flameshot gui ;;
+    full) exec flameshot full -p "$HOME/Pictures" ;;
+    clip) exec flameshot gui -c ;;
+    *) echo "Usage: dots-screenshot area|full|clip" >&2; exit 2 ;;
+esac

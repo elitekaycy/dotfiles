@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# The main rofi hub (Super+Alt+Space). Type to filter; Escape goes back.
+set -Eeuo pipefail
+
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+menu() {
+    # menu <prompt> <lines>  (rows on stdin); prints the chosen row's label
+    local chosen
+    chosen="$(rofi -dmenu -i -p "$1" -no-custom \
+        -theme-str 'window { width: 22em; }' \
+        -theme-str "listview { lines: $2; }")" || return 1
+    [[ -n "$chosen" ]] || return 1
+    printf '%s\n' "${chosen##*  }"
+}
+
+wallpaper_menu() {
+    case "$(printf '%s\n' "  Pick" "  Next" "  Theme default" | menu "Wallpaper" 3)" in
+        Pick) exec "$BIN_DIR/dots-bg-menu" ;;
+        Next) exec "$BIN_DIR/dots-bg-next" ;;
+        "Theme default")
+            rm -f "${XDG_CONFIG_HOME:-$HOME/.config}/current-wallpaper"
+            exec "$BIN_DIR/dots-theme-set" "$("$BIN_DIR/dots-theme-current")"
+            ;;
+        *) main_menu ;;
+    esac
+}
+
+theme_menu() {
+    case "$(printf '%s\n' "  Pick" "  Next" | menu "Theme" 2)" in
+        Pick) exec "$BIN_DIR/dots-theme-menu" ;;
+        Next) exec "$BIN_DIR/dots-theme-next" ;;
+        *) main_menu ;;
+    esac
+}
+
+screenshot_menu() {
+    case "$(printf '%s\n' "  Area" "  Full screen" "  Area to clipboard" | menu "Screenshot" 3)" in
+        Area) exec "$BIN_DIR/dots-screenshot" area ;;
+        "Full screen") exec "$BIN_DIR/dots-screenshot" full ;;
+        "Area to clipboard") exec "$BIN_DIR/dots-screenshot" clip ;;
+        *) main_menu ;;
+    esac
+}
+
+main_menu() {
+    local rows=(
+        "󰀻  Apps"
+        "  Theme"
+        "  Wallpaper"
+        "  Session"
+        "  Keybindings"
+        "󰖩  WiFi"
+        "󰂯  Bluetooth"
+        "  Screenshot"
+        "  Clipboard"
+        "  Lock"
+        "⏻  Power"
+    )
+    case "$(printf '%s\n' "${rows[@]}" | menu "Menu" "${#rows[@]}")" in
+        Apps)        exec rofi -show drun ;;
+        Theme)       theme_menu ;;
+        Wallpaper)   wallpaper_menu ;;
+        Session)     exec "$BIN_DIR/dots-session" --menu ;;
+        Keybindings) exec "$BIN_DIR/dots-keys" ;;
+        WiFi)        exec "$BIN_DIR/dots-wifi" ;;
+        Bluetooth)   exec "$BIN_DIR/dots-bluetooth" ;;
+        Screenshot)  screenshot_menu ;;
+        Clipboard)   exec rofi -modi "clipboard:greenclip print" -show clipboard ;;
+        Lock)        exec "$BIN_DIR/dots-lock" ;;
+        Power)       exec "$BIN_DIR/dots-power" ;;
+        *) exit 0 ;;
+    esac
+}
+
+main_menu

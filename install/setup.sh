@@ -30,8 +30,7 @@ make_executable() {
     chmod +x "$DOTFILES_DIR"/polybar/.config/polybar/scripts/*.sh 2>/dev/null || true
     chmod +x "$HOME"/.config/polybar/*.sh 2>/dev/null || true
     chmod +x "$HOME"/.config/polybar/scripts/*.sh 2>/dev/null || true
-    chmod +x "$DOTFILES_DIR"/themes/.config/themes/scripts/*.sh 2>/dev/null || true
-    chmod +x "$HOME"/.config/themes/scripts/*.sh 2>/dev/null || true
+    chmod +x "$DOTFILES_DIR"/bin/.local/bin/dots-* 2>/dev/null || true
 
     log_success "Scripts are executable"
 }
@@ -43,7 +42,7 @@ setup_themes() {
     local reload="${1:-false}"
     log_info "Setting up theme switcher..."
 
-    local apply_script="${XDG_CONFIG_HOME:-$HOME/.config}/themes/scripts/apply-theme.sh"
+    local apply_script="$HOME/.local/bin/dots-theme-set"
 
     if [[ -s "$current_theme_file" ]]; then
         theme="$(<"$current_theme_file")"

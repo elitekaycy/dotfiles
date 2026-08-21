@@ -39,16 +39,25 @@ bindsym XF86AudioPrev exec playerctl previous
 bindsym XF86AudioStop exec playerctl stop
 
 # Screen lock
-bindsym $mod+Escape exec --no-startup-id ~/.config/themes/scripts/lock.sh
+bindsym $mod+Escape exec --no-startup-id ~/.local/bin/dots-lock
 
 # Clipboard manager (rofi-greenclip)
 bindsym $mod+v exec rofi -modi "clipboard:greenclip print" -show clipboard
 
-# Theme switcher
-bindsym $mod+t exec ~/.config/themes/scripts/rofi-theme-picker.sh
+# Main menu hub (Omarchy-style): apps, theme, wallpaper, sessions, wifi, power...
+bindsym $mod+Mod1+space exec --no-startup-id ~/.local/bin/dots-menu
 
-# Wallpaper picker
-bindsym $mod+Shift+b exec ~/.config/polybar/scripts/rofi-wallpaper.sh
+# Theme: picker (Mod+t or Mod+Ctrl+Shift+Space), cycle next (Mod+Ctrl+t)
+bindsym $mod+t exec --no-startup-id ~/.local/bin/dots-theme-menu
+bindsym $mod+Ctrl+Shift+space exec --no-startup-id ~/.local/bin/dots-theme-menu
+bindsym $mod+Ctrl+t exec --no-startup-id ~/.local/bin/dots-theme-next
+
+# Wallpaper: picker (Mod+Shift+b), cycle next within theme (Mod+Ctrl+Space)
+bindsym $mod+Shift+b exec --no-startup-id ~/.local/bin/dots-bg-menu
+bindsym $mod+Ctrl+space exec --no-startup-id ~/.local/bin/dots-bg-next
+
+# Keybinding reference
+bindsym $mod+Shift+slash exec --no-startup-id ~/.local/bin/dots-keys
 
 # Media launchers
 bindsym $mod+m exec kitty -e ncspot
@@ -64,9 +73,9 @@ bindsym $mod+z exec zen
 bindsym $mod+b exec firefox
 bindsym $mod+f fullscreen toggle
 
-# Launch tmux sessions
-bindsym $mod+Shift+w exec kitty -e ~/.config/i3/work-tmux-session.sh
-bindsym $mod+Shift+t exec kitty -e ~/.config/i3/scalestash-tmux-session.sh
+# Launch tmux sessions (dots-session --menu lists them all)
+bindsym $mod+Shift+w exec kitty -e ~/.local/bin/dots-session work
+bindsym $mod+Shift+t exec kitty -e ~/.local/bin/dots-session scalestash
 
 bindsym $mod+h focus left
 bindsym $mod+j focus down
@@ -158,7 +167,7 @@ exec --no-startup-id picom -b
 exec --no-startup-id dunst
 
 # Screen lock on suspend
-exec --no-startup-id xss-lock -- ~/.config/themes/scripts/lock.sh
+exec --no-startup-id xss-lock -- ~/.local/bin/dots-lock
 
 # Clipboard daemon
 exec --no-startup-id greenclip daemon
@@ -173,9 +182,9 @@ exec --no-startup-id xset r rate 200 50
 
 exec --no-startup-id xinput list --name-only | grep -i touchpad | xargs -I {} xinput set-prop "{}" "libinput Natural Scrolling Enabled" 1
 
-# Wallpaper - use saved wallpaper or default
+# Monitors, then restore the remembered wallpaper
 exec_always --no-startup-id ~/.config/i3/display-setup.sh
-exec_always --no-startup-id ~/.config/i3/wallpaper-setup.sh
+exec_always --no-startup-id ~/.local/bin/dots-bg-set
 
 
 

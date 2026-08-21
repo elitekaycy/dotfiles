@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# Rofi Wi-Fi menu (NetworkManager).
+set -Eeuo pipefail
+
+current="$(nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '$1 == "yes" { print $2; exit }')"
+wifi_dev="$(nmcli -t -f DEVICE,TYPE dev 2>/dev/null | awk -F: '$2 == "wifi" { print $1; exit }')"
+
+toggle="󰖩  Toggle WiFi"
+scan="  Scan Networks"
+disconnect="󰖪  Disconnect"
+
+rows=("$toggle" "$scan")
+[[ -n "$current" ]] && rows+=("$disconnect")
+
+while IFS=':' read -r ssid signal security; do
+    [[ -n "$ssid" ]] || continue
+    if (( signal >= 70 )); then icon="󰤨"; elif (( signal >= 40 )); then icon="󰤥"; else icon="󰤟"; fi
+    lock=""
+    [[ -n "$security" && "$security" != "--" ]] && lock="  󰌾"
+    mark=""
+    [[ "$ssid" == "$current" ]] && mark="  "
+    rows+=("$icon  $ssid$lock$mark")
+done < <(nmcli -t -f SSID,SIGNAL,SECURITY dev wifi list 2>/dev/null | grep -v '^:' | sort -t: -k2 -rn | awk -F: '!seen[$1]++')
+
+chosen="$(printf '%s\n' "${rows[@]}" | rofi -dmenu -i -p "WiFi" -no-custom \
+    -theme-str 'window { width: 32em; }' \
+    -theme-str 'listview { lines: 10; }')" || exit 0
+
+case "$chosen" in
+    "$toggle")
+        if [[ "$(nmcli radio wifi)" == "enabled" ]]; then
+            nmcli radio wifi off && notify-send "WiFi" "Disabled"
+        else
+            nmcli radio wifi on && notify-send "WiFi" "Enabled"
+        fi
+        ;;
+    "$scan")
+        nmcli dev wifi rescan && notify-send "WiFi" "Scanning..."
+        ;;
+    "$disconnect")
+        [[ -n "$wifi_dev" ]] && nmcli dev disconnect "$wifi_dev" && notify-send "WiFi" "Disconnected"
+        ;;
+    "")
+        exit 0
+        ;;
+    *)
+        ssid="${chosen#*  }"
+        ssid="${ssid%%  *}"
+        [[ "$ssid" == "$current" ]] && { notify-send "WiFi" "Already connected to $ssid"; exit 0; }
+        if nmcli -t -f NAME con show | grep -qx "$ssid"; then
+            nmcli con up "$ssid"
+        else
+            password="$(rofi -dmenu -password -p "Password for $ssid" -theme-str 'window { width: 32em; }')" || exit 0
+            [[ -n "$password" ]] && nmcli dev wifi connect "$ssid" password "$password"
+        fi
+        ;;
+esac

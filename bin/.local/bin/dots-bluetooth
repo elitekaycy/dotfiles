@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Rofi Bluetooth menu (bluetoothctl).
+set -Eeuo pipefail
+
+powered="$(bluetoothctl show 2>/dev/null | awk '/Powered:/ { print $2 }')"
+connected="$(bluetoothctl devices Connected 2>/dev/null || true)"
+paired="$(bluetoothctl devices Paired 2>/dev/null || true)"
+
+toggle="󰂯  Toggle Bluetooth"
+scan="  Scan Devices"
+disconnect_all="󰂲  Disconnect All"
+
+rows=("$toggle" "$scan")
+[[ -n "$connected" ]] && rows+=("$disconnect_all")
+
+while read -r _ mac name; do
+    [[ -n "$mac" ]] || continue
+    rows+=("󰂱  $name  [$mac]")
+done <<< "$connected"
+
+while read -r _ mac name; do
+    [[ -n "$mac" ]] || continue
+    grep -q "$mac" <<< "$connected" && continue
+    rows+=("󰂯  $name  [$mac]")
+done <<< "$paired"
+
+chosen="$(printf '%s\n' "${rows[@]}" | rofi -dmenu -i -p "Bluetooth" -no-custom \
+    -theme-str 'window { width: 34em; }' \
+    -theme-str 'listview { lines: 12; }')" || exit 0
+
+case "$chosen" in
+    "$toggle")
+        if [[ "$powered" == "yes" ]]; then
+            bluetoothctl power off && notify-send "Bluetooth" "Disabled"
+        else
+            bluetoothctl power on && notify-send "Bluetooth" "Enabled"
+        fi
+        ;;
+    "$scan")
+        notify-send "Bluetooth" "Scanning for 10 seconds..."
+        bluetoothctl --timeout 10 scan on >/dev/null 2>&1 &
+        ;;
+    "$disconnect_all")
+        while read -r _ mac _; do
+            [[ -n "$mac" ]] && bluetoothctl disconnect "$mac" >/dev/null 2>&1
+        done <<< "$connected"
+        notify-send "Bluetooth" "Disconnected all devices"
+        ;;
+    "")
+        exit 0
+        ;;
+    *)
+        mac="$(grep -oE '[0-9A-F]{2}(:[0-9A-F]{2}){5}' <<< "$chosen" || true)"
+        [[ -n "$mac" ]] || exit 0
+        name="${chosen#*  }"
+        name="${name%%  \[*}"
+        if grep -q "$mac" <<< "$connected"; then
+            bluetoothctl disconnect "$mac" && notify-send "Bluetooth" "Disconnected from $name"
+        else
+            notify-send "Bluetooth" "Connecting to $name..."
+            bluetoothctl connect "$mac"
+        fi
+        ;;
+esac

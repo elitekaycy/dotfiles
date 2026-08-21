@@ -17,8 +17,8 @@ has_process() {
     pgrep -u "$UID" "$@" >/dev/null 2>&1
 }
 
-if ! has_process -f 'kitty .*startup-terminal\.sh'; then
-    run_on_workspace "$ws1" "kitty -e $HOME/.config/i3/startup-terminal.sh"
+if ! has_process -f 'kitty .*dots-session main'; then
+    run_on_workspace "$ws1" "kitty -e $HOME/.local/bin/dots-session main"
 fi
 
 if ! has_process -x firefox; then

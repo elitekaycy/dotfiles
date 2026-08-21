@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-# Rofi theme picker. Type to filter by name or by "dark"/"light".
+# Rofi theme picker. Type to filter by name or by "dark" / "light".
 set -Eeuo pipefail
 
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-THEMES_DIR="$CONFIG_HOME/themes"
-THEMES_CONF_DIR="$THEMES_DIR/themes"
-SCRIPTS_DIR="$THEMES_DIR/scripts"
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+THEMES_CONF_DIR="$CONFIG_HOME/themes/themes"
 CURRENT_THEME_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/theme"
 
 current="$(cat "$CURRENT_THEME_FILE" 2>/dev/null || true)"
@@ -43,4 +42,4 @@ index="$(printf '%s\n' "${rows[@]}" | rofi -dmenu -i -p "Theme" \
     -theme-str 'listview {lines: 10;}')" || exit 0
 
 [[ -n "$index" ]] || exit 0
-exec "$SCRIPTS_DIR/apply-theme.sh" "${theme_ids[$index]}"
+exec "$BIN_DIR/dots-theme-set" "${theme_ids[$index]}"

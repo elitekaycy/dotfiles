@@ -1,2 +1,5 @@
 external-sources=true
-disable=SC1090,SC1091
+# SC1090/SC1091: sourced paths are dynamic (theme files, install modules).
+# SC2015: `a && b || true` is used deliberately as "best effort".
+# SC2119/SC2120: setup functions take optional args passed from other files.
+disable=SC1090,SC1091,SC2015,SC2119,SC2120

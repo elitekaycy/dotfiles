@@ -11,15 +11,19 @@ log "checking whitespace"
 git diff --check
 
 log "checking shell syntax"
-while IFS= read -r script; do
+mapfile -t shell_scripts < <(git ls-files --cached --others --exclude-standard '*.sh' 'bin/.local/bin/dots-*' | sort -u)
+for script in "${shell_scripts[@]}"; do
     bash -n "$script"
-done < <(git ls-files --cached --others --exclude-standard '*.sh' | sort -u)
+done
 zsh -n zsh/.zshrc
+
+for command in bin/.local/bin/dots-*; do
+    [[ -x "$command" ]] || fail "command must be executable: $command"
+done
 
 if command -v shellcheck >/dev/null; then
     log "running ShellCheck"
-    mapfile -t shell_scripts < <(git ls-files --cached --others --exclude-standard '*.sh' | sort -u)
-    shellcheck --external-sources "${shell_scripts[@]}"
+    shellcheck --external-sources --shell=bash "${shell_scripts[@]}"
 else
     log "ShellCheck unavailable; syntax checks still ran"
 fi

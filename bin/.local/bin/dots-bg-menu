@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Rofi wallpaper picker. Current theme's wallpapers first, then shared/, then the rest.
+set -Eeuo pipefail
+
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WALLPAPER_ROOT="$HOME/Pictures/wallpapers"
+theme="$(cat "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/theme" 2>/dev/null || echo tokyo-night)"
+
+list_dir() {
+    find "$1" -maxdepth 1 -type f \
+        \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) 2>/dev/null | sort
+}
+
+rows=()
+while IFS= read -r file; do [[ -n "$file" ]] && rows+=("${file#"$WALLPAPER_ROOT"/}"); done < <(list_dir "$WALLPAPER_ROOT/$theme")
+while IFS= read -r file; do [[ -n "$file" ]] && rows+=("${file#"$WALLPAPER_ROOT"/}"); done < <(list_dir "$WALLPAPER_ROOT/shared")
+while IFS= read -r dir; do
+    [[ -n "$dir" ]] || continue
+    name="$(basename "$dir")"
+    [[ "$name" == "$theme" || "$name" == "shared" ]] && continue
+    while IFS= read -r file; do [[ -n "$file" ]] && rows+=("${file#"$WALLPAPER_ROOT"/}"); done < <(list_dir "$dir")
+done < <(find "$WALLPAPER_ROOT" -mindepth 1 -maxdepth 1 -type d | sort)
+while IFS= read -r file; do [[ -n "$file" ]] && rows+=("${file#"$WALLPAPER_ROOT"/}"); done < <(list_dir "$WALLPAPER_ROOT")
+
+if [[ ${#rows[@]} -eq 0 ]]; then
+    notify-send "Wallpaper" "No wallpapers in $WALLPAPER_ROOT" -i dialog-warning
+    exit 1
+fi
+
+selected="$(printf '%s\n' "${rows[@]}" | rofi -dmenu -i -p "Wallpaper" -no-custom \
+    -theme-str 'window {width: 32em;}' \
+    -theme-str 'listview {lines: 12;}')" || exit 0
+[[ -n "$selected" ]] || exit 0
+
+"$BIN_DIR/dots-bg-set" "$WALLPAPER_ROOT/$selected"
+notify-send "Wallpaper" "$selected" -i preferences-desktop-wallpaper

@@ -16,7 +16,7 @@ for theme_file in "$ROOT"/themes/.config/themes/themes/*.conf; do
     HOME="$TEST_HOME" \
     XDG_CONFIG_HOME="$TEST_HOME/.config" \
     XDG_STATE_HOME="$TEST_HOME/.local/state" \
-        "$TEST_HOME/.config/themes/scripts/apply-theme.sh" --no-reload "$theme_id"
+        "$TEST_HOME/.local/bin/dots-theme-set" --no-reload "$theme_id"
     [[ "$(<"$TEST_HOME/.local/state/dotfiles/theme")" == "$theme_id" ]]
     if grep -R '{{[A-Z_]*}}' \
         "$TEST_HOME/.config/polybar/config.ini" \

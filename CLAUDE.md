@@ -5,7 +5,11 @@ This file defines repository conventions for coding agents and contributors.
 ## Project invariants
 
 - `pvim/.config/pvim` is the only Git submodule. tmux plugins belong to TPM under `~/.tmux/plugins/`.
-- Generated theme outputs are not tracked: Polybar `config.ini`, Kitty `theme.conf`, Dunst `dunstrc`, Rofi `config.rasi`, and the selected theme are runtime state.
+- Generated theme outputs are not tracked: Polybar `config.ini`, Kitty `theme.conf`, Dunst `dunstrc`, Rofi `config.rasi`, i3 `theme.conf`, tmux `theme.conf`, and the selected theme are runtime state.
+- One theme source drives every app. Never hardcode a colour in an app config; add it to the template and theme files instead.
+- Every user-facing action is a `dots-*` command in `bin/.local/bin/`. i3, Polybar and the shell call those commands; do not scatter scripts under `~/.config/<app>/`.
+- Wallpapers live in `wallpapers/<theme-id>/` or `wallpapers/shared/`.
+- Existing keybindings are never changed; new features get new chords and are documented in the README keybinding tables.
 - Deploy configs through `install/deploy.sh` with GNU Stow `--restow --no-folding`.
 - Never overwrite or delete an unmanaged config without first preserving it in the dotfiles backup directory.
 - The updater must not reset, rebase, clean, or auto-stash a user worktree. Clean branches may only fast-forward.

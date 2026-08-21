@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Cycle to the next wallpaper for the current theme (theme dir + shared/).
+set -Eeuo pipefail
+
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WALLPAPER_ROOT="$HOME/Pictures/wallpapers"
+theme="$(cat "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/theme" 2>/dev/null || echo tokyo-night)"
+
+mapfile -t backgrounds < <(find "$WALLPAPER_ROOT/$theme" "$WALLPAPER_ROOT/shared" -maxdepth 1 -type f \
+    \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) 2>/dev/null | sort)
+
+if [[ ${#backgrounds[@]} -eq 0 ]]; then
+    notify-send "Wallpaper" "No wallpapers for theme $theme" -i dialog-warning
+    exit 1
+fi
+
+current="$(cat "$CONFIG_HOME/current-wallpaper" 2>/dev/null || true)"
+next="${backgrounds[0]}"
+for i in "${!backgrounds[@]}"; do
+    if [[ "${backgrounds[$i]}" == "$current" ]]; then
+        next="${backgrounds[$(( (i + 1) % ${#backgrounds[@]} ))]}"
+        break
+    fi
+done
+
+"$BIN_DIR/dots-bg-set" "$next"
+notify-send "Wallpaper" "${next#"$WALLPAPER_ROOT"/}" -i preferences-desktop-wallpaper

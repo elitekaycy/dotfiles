@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Cycle to the next theme (alphabetical, wraps around).
+set -Eeuo pipefail
+
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+THEMES_CONF_DIR="$CONFIG_HOME/themes/themes"
+CURRENT_THEME_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/theme"
+
+mapfile -t themes < <(find "$THEMES_CONF_DIR" -maxdepth 1 -name '*.conf' -printf '%f\n' | sed 's/\.conf$//' | sort)
+[[ ${#themes[@]} -gt 0 ]] || exit 0
+
+current="$(cat "$CURRENT_THEME_FILE" 2>/dev/null || true)"
+next="${themes[0]}"
+for i in "${!themes[@]}"; do
+    if [[ "${themes[$i]}" == "$current" ]]; then
+        next="${themes[$(( (i + 1) % ${#themes[@]} ))]}"
+        break
+    fi
+done
+
+exec "$BIN_DIR/dots-theme-set" "$next"

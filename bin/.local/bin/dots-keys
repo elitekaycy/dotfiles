@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Show every i3 keybinding in a searchable rofi list.
+set -Eeuo pipefail
+
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/i3/config"
+
+awk '
+    /^bindsym/ {
+        key = $2
+        gsub(/\$mod/, "Super", key)
+        gsub(/Mod1/, "Alt", key)
+        gsub(/Control/, "Ctrl", key)
+        $1 = ""; $2 = ""
+        action = $0
+        sub(/^ +/, "", action)
+        sub(/^exec (--no-startup-id )?/, "", action)
+        gsub(/~\/.local\/bin\//, "", action)
+        gsub(/~\/.config\//, "", action)
+        printf "%-28s %s\n", key, action
+    }
+' "$CONFIG" | rofi -dmenu -i -p "Keys" -no-custom \
+    -theme-str 'window { width: 60em; }' \
+    -theme-str 'listview { lines: 18; }' \
+    -theme-str 'element-text { font: "JetBrainsMono Nerd Font 10"; }' >/dev/null || true

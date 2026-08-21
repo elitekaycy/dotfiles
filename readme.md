@@ -2,261 +2,216 @@
 
 [![Verify dotfiles](https://github.com/elitekaycy/dotfiles/actions/workflows/verify.yml/badge.svg)](https://github.com/elitekaycy/dotfiles/actions/workflows/verify.yml)
 
-Portable, conflict-aware Linux dotfiles for an i3, Kitty, tmux, Zsh, Neovim, Rofi, and Polybar workstation.
+My i3 workstation: i3 + Polybar + Rofi + Kitty + tmux + Zsh + Neovim (pvim), themed from one source and driven by a small set of `dots-*` commands. Built for me, kept lean.
 
 ![Desktop running these dotfiles](./docs/dotfiles.png)
 
-## What this repository does
+## How it fits together
 
-- Installs workstation packages on Ubuntu/Debian, Fedora, and Arch-based systems.
-- Manages language runtimes and CLI tools from one [mise](https://mise.jdx.dev/) manifest.
-- Deploys configuration with GNU Stow without replacing whole config directories.
-- Preserves conflicting files under `~/.local/state/dotfiles/backups/` before linking.
-- Updates only by fast-forward; it never resets, rebases, or auto-stashes local work.
-- Renders synchronized Polybar, Kitty, Dunst, Rofi, Neovim, and wallpaper themes.
-- Verifies shell syntax, structured config, submodules, tmux, Neovim, fresh installs, and upgrades in CI.
+```text
+themes/<id>.conf  ──►  dots-theme-set  ──►  polybar · kitty · dunst · rofi · i3 · tmux · pvim · wallpaper
+                            ▲
+   Mod+t / Mod+Ctrl+Shift+Space ── dots-theme-menu (rofi)
+   Mod+Ctrl+t ──────────────────── dots-theme-next
+   Mod+Alt+Space ───────────────── dots-menu (hub: apps, theme, wallpaper, sessions, wifi, bluetooth, …)
+```
 
-The full installer is opinionated: it can install i3, NVIDIA drivers when detected, Docker, Chrome, Rust, fonts, and development tools. Review `install.sh` and use a selective component if you do not want the complete workstation.
+- **One theme source** (`themes/.config/themes/themes/<id>.conf`) defines ~20 colours. `dots-theme-set` renders every app template from it and reloads the desktop. Nothing is hardcoded per app.
+- **Per-theme wallpapers** live in `wallpapers/<theme-id>/`; `wallpapers/shared/` works with any theme. Switching theme switches wallpaper; `Mod+Ctrl+Space` cycles within the theme.
+- **Every picker is Rofi** and every action is a `dots-*` command, so i3, Polybar and the shell all call the same thing.
+- **Stow deploys** each package without folding directories; generated files are user state, never committed.
 
-## Requirements
-
-- A supported Linux family: Ubuntu/Debian, Fedora, Arch/Manjaro/EndeavourOS
-- `git` for cloning
-- `sudo` access for system packages
-- An internet connection for the first full install
-
-Desktop behavior targets X11+i3. The config files can still be installed selectively on another desktop.
-
-## Fresh installation
+## Install
 
 ```bash
 git clone --recurse-submodules https://github.com/elitekaycy/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./install.sh
+./install.sh            # full workstation (Ubuntu/Debian, Fedora, Arch)
 ```
 
-The installer is idempotent. Existing unmanaged files that collide with a managed file are moved—not deleted—to a timestamped directory under:
+Conflicting unmanaged files are moved (never deleted) to `~/.local/state/dotfiles/backups/<timestamp>/`. Log out after the first full install.
 
-```text
-~/.local/state/dotfiles/backups/
-```
+| Component | What it does |
+| --- | --- |
+| `./install.sh stow [--dry-run]` | Reconcile config symlinks only |
+| `./install.sh setup` | Links, wallpapers, theme, TPM plugins, pvim |
+| `./install.sh themes` | Render the saved theme (Tokyo Night on first use) |
+| `./install.sh wallpapers` | Copy `wallpapers/` into `~/Pictures/wallpapers/` |
+| `./install.sh core` / `i3` / `terminal` / `fonts` / `zsh` | System packages by area |
+| `./install.sh devtools` / `languages` | Everything in the mise manifest |
+| `./install.sh docker` / `chrome` / `rust` / `nvidia` / `greenclip` / `slack` / `media` | Optional extras |
+| `./install.sh check` | Run the verification suite, change nothing |
 
-Unrelated files inside directories such as `~/.config/nvim/` are left in place. Log out after the first full install so the shell, Docker group, and i3 session changes take effect.
-
-### Preview or verify first
+## Update
 
 ```bash
-./install.sh stow --dry-run  # show Stow conflicts; change nothing
-./install.sh check           # run the repository verification suite
-./scripts/verify.sh          # same verifier used by GitHub Actions
+./update.sh                          # fast-forward, verify, restow, re-render theme, mise + TPM
+./update.sh --local                  # skip git; apply the current checkout
+./update.sh --local --configs-only   # links + theme + wallpapers only, no tool sync
+./update.sh --check                  # fetch + verify, deploy nothing
 ```
 
-### Selective install commands
+A dirty checkout is never reset, rebased or stashed; it is deployed as-is and the command exits `2`.
 
-| Command | Purpose |
+## Commands
+
+All live in `bin/.local/bin/` and are on `PATH` as `~/.local/bin/dots-*`.
+
+| Command | Does |
 | --- | --- |
-| `./install.sh core` | Git, curl, wget, Stow, build tools, unzip, xclip |
-| `./install.sh nvidia` | Install a driver only when an NVIDIA GPU is detected |
-| `./install.sh i3` | i3, Rofi, Polybar, Picom, Dunst, Feh, Flameshot, and desktop utilities |
-| `./install.sh terminal` | Kitty, tmux, and Zsh packages |
-| `./install.sh zsh` | Oh My Zsh, mise, and Atuin |
-| `./install.sh devtools` | Install every tool declared in the mise config |
-| `./install.sh languages` | Node.js, Java, Python, Maven, Gradle, and pnpm |
-| `./install.sh docker` | Docker Engine and Compose |
-| `./install.sh chrome` | Google Chrome |
-| `./install.sh fonts` | JetBrains Mono Nerd Font |
-| `./install.sh greenclip` | Greenclip clipboard manager |
-| `./install.sh rust` | Rust via rustup |
-| `./install.sh stow` | Safely reconcile config links only |
-| `./install.sh setup` | Config links, wallpapers, theme, TPM plugins, and pvim setup |
-| `./install.sh pvim` | Run the pvim submodule installer |
-| `./install.sh themes` | Render the saved theme, or Tokyo Night on first use |
-| `./install.sh wallpapers` | Copy repository wallpapers into `~/Pictures/wallpapers/` |
-| `./install.sh slack` | Create a Chrome-based Slack web app |
-| `./install.sh media` | Install ncspot, ani-cli, and lobster |
-| `./install.sh check` | Run all repository checks without changing the system |
-
-Unknown component names fail instead of accidentally running the full installer.
-
-## Safe updates
-
-On a machine with a clean checkout:
-
-```bash
-cd ~/dotfiles
-./update.sh
-```
-
-The default update:
-
-1. acquires a lock so two updates cannot overlap;
-2. fetches and fast-forwards the configured upstream;
-3. updates the `pvim` submodule;
-4. runs the same verification suite as CI;
-5. reconciles Stow links and backs up real conflicts;
-6. refreshes wallpapers and the selected theme;
-7. runs `mise install` and updates TPM plugins; and
-8. reloads i3/tmux when they are running.
-
-It intentionally does not run `mise prune`, rewrite Git history, delete unmanaged files, or hide local changes in an automatic stash.
-
-| Command | Behavior |
-| --- | --- |
-| `./update.sh` | Sync upstream, verify, deploy configs, and sync tools/plugins |
-| `./update.sh --check` | Fetch and verify only; deploy nothing |
-| `./update.sh --local` | Skip Git and deploy intentional edits in the current checkout |
-| `./update.sh --configs-only` | Reconcile configs/themes/wallpapers; skip mise and TPM updates |
-| `./update.sh --no-reload` | Update everything without reloading desktop applications |
-| `./update.sh --local --configs-only --no-reload` | Apply local config edits with no network/tool/reload side effects |
-
-If the checkout is dirty, the default command preserves it, skips remote synchronization, deploys the current local files, and exits with status `2` so automation can detect that upstream was not applied. Commit or stash the changes and rerun to receive remote updates.
+| `dots-menu` | Rofi hub: Apps · Theme · Wallpaper · Session · Keybindings · WiFi · Bluetooth · Screenshot · Clipboard · Lock · Power |
+| `dots-theme-menu` | Rofi theme picker; type a name or `dark` / `light` to filter |
+| `dots-theme-set [--no-reload] <id>` | Render + apply a theme (`dots-theme-set nord`) |
+| `dots-theme-next` | Cycle to the next theme |
+| `dots-theme-current` | Print the selected theme id |
+| `dots-bg-menu` | Rofi wallpaper picker (current theme first, then `shared/`, then the rest) |
+| `dots-bg-next` | Next wallpaper within the current theme + `shared/` |
+| `dots-bg-set [path]` | Set a wallpaper on every monitor; no arg restores the last one |
+| `dots-session <name>` / `--menu` | Create/attach tmux session `main`, `work`, `scalestash`, or any name; `--menu` picks in Rofi |
+| `dots-keys` | Searchable list of every i3 keybinding |
+| `dots-wifi` / `dots-bluetooth` | Rofi network menus (also opened by clicking the Polybar modules) |
+| `dots-screenshot area\|full\|clip` | Flameshot |
+| `dots-lock` | i3lock in the theme background colour |
+| `dots-power` | Lock · Logout · Suspend · Hibernate · Reboot · Shutdown |
 
 ## Themes
 
-Press `Mod+t` to open the Rofi theme picker. A selection updates Polybar, Kitty, Dunst, Rofi, the pvim theme marker, and the matching wallpaper.
+Available: `catppuccin-latte` `catppuccin-mocha` `dracula` `gruvbox-dark` `gruvbox-light` `nord` `nord-light` `tokyo-night` `tokyo-night-light`
 
-Apply a theme directly:
+What one theme drives:
 
-```bash
-~/.config/themes/scripts/apply-theme.sh tokyo-night
-~/.config/themes/scripts/apply-theme.sh --no-reload nord
-```
+| App | Rendered file | How it is picked up |
+| --- | --- | --- |
+| Polybar | `~/.config/polybar/config.ini` | bar restarted |
+| Kitty | `~/.config/kitty/theme.conf` | `include theme.conf`; live via remote control |
+| Dunst | `~/.config/dunst/dunstrc` | daemon restarted |
+| Rofi | `~/.config/rofi/config.rasi` | next launch |
+| i3 | `~/.config/i3/theme.conf` | `include` in i3 config; `i3-msg reload` |
+| tmux | `~/.config/tmux/theme.conf` | `source-file` in `.tmux.conf`; live reload |
+| pvim | `~/.local/share/nvim/pvim_theme.txt` | read on startup |
+| Lockscreen | — | `dots-lock` reads the theme background |
+| Wallpaper | `~/.config/current-wallpaper` | first file in `wallpapers/<id>/` unless the current one already belongs to the theme |
 
-Available theme IDs:
-
-- `catppuccin-latte`
-- `catppuccin-mocha`
-- `dracula`
-- `gruvbox-dark`
-- `gruvbox-light`
-- `nord`
-- `nord-light`
-- `tokyo-night`
-- `tokyo-night-light`
-
-The selected ID is stored at `~/.local/state/dotfiles/theme`. Rendered application files are user state and are deliberately not tracked by Git.
+Selected id: `~/.local/state/dotfiles/theme`.
 
 ### Add a theme
 
-1. Copy a file in `themes/.config/themes/themes/`, for example `tokyo-night.conf`.
-2. Give it a unique lowercase filename; that filename is the CLI/Rofi theme ID.
-3. Define `THEME_NAME`, `THEME_TYPE`, `WALLPAPER`, `NVIM_THEME`, and every color variable used by the templates.
-4. Add the referenced wallpaper to `wallpapers/`.
-5. Run `./update.sh --local --configs-only`, then select the theme with `Mod+t`.
-6. Run `./scripts/verify.sh` before committing.
+1. Copy `themes/.config/themes/themes/tokyo-night.conf` to `<id>.conf` and set `THEME_NAME`, `THEME_TYPE` (`dark`/`light`), `NVIM_THEME`, and the colours.
+2. Put one or more wallpapers in `wallpapers/<id>/`.
+3. `./update.sh --local --configs-only`, then `Mod+t`.
 
-The templates live in `themes/.config/themes/templates/`. Change a template when every theme should render a new application setting.
+Templates are in `themes/.config/themes/templates/`; edit one when *every* theme should render a new setting. Placeholders: `{{BG}} {{BG_HEX}} {{BG_ALT}} {{FG}} {{FG_DIM}} {{PRIMARY}} {{SECONDARY}} {{ACCENT}} {{RED}} {{GREEN}} {{YELLOW}} {{BLUE}} {{MAGENTA}} {{CYAN}} {{WHITE}} {{BLACK}} {{THEME_NAME}} {{THEME_TYPE}}`.
 
 ## Wallpapers
 
-Press `Mod+Shift+b` to open the Rofi wallpaper picker. It reads `.jpg`, `.jpeg`, `.png`, and `.webp` files from `~/Pictures/wallpapers/`; the last choice is restored when i3 starts.
-
-To add a repository wallpaper:
-
-```bash
-cp path/to/image.webp ~/dotfiles/wallpapers/my-wallpaper.webp
-cd ~/dotfiles
-./install.sh wallpapers
+```text
+wallpapers/
+├── tokyo-night/        # used when tokyo-night is active
+├── nord/ …             # one directory per theme id
+└── shared/             # offered with every theme (lofi-*, an.jpg)
 ```
 
-To keep a wallpaper private to one machine, copy it directly to `~/Pictures/wallpapers/` instead. Repository updates preserve extra local files in that directory.
+`./install.sh wallpapers` copies the tree to `~/Pictures/wallpapers/` additively, so machine-local extras dropped there survive updates. `Mod+Shift+b` lists everything; `Mod+Ctrl+Space` cycles the current theme's set.
 
 ## Keybindings
 
-`Mod` is the Super/Windows key.
+`Mod` = Super. Shown live with `Mod+Shift+/` (`dots-keys`).
 
-### i3 and Rofi
+### Launchers and menus
 
 | Key | Action |
 | --- | --- |
-| `Mod+Return` | Open Kitty |
-| `Mod+d` | Open the Rofi application launcher |
-| `Mod+p` | Open dmenu |
-| `Mod+t` | Open the Rofi theme picker |
-| `Mod+Shift+b` | Open the Rofi wallpaper picker |
-| `Mod+v` | Open Greenclip history in Rofi |
-| `Mod+h/j/k/l` | Focus left/down/up/right |
-| `Mod+Shift+h/j/k/l` | Move the focused window |
-| `Mod+1…0` | Switch to workspace 1…10 |
-| `Mod+Shift+1…0` | Move a window to workspace 1…10 |
-| `Mod+a` / `Mod+-` | Split vertically / horizontally |
-| `Mod+s/w/e` | Stacking / tabbed / toggle split layout |
-| `Mod+f` | Toggle fullscreen |
+| `Mod+Return` | Kitty |
+| `Mod+d` | Rofi app launcher |
+| `Mod+Alt+Space` | **Main menu hub** (`dots-menu`) |
+| `Mod+v` | Clipboard history (greenclip) |
+| `Mod+Shift+/` | Keybinding reference |
+| `Mod+z` / `Mod+b` | Zen browser / Firefox |
+| `Mod+m` | ncspot |
+| `Mod+Shift+a` / `Mod+Shift+v` | ani-cli / lobster |
+| `Mod+Shift+w` | tmux session `work` |
+| `Mod+Shift+t` | tmux session `scalestash` |
+
+### Theme and wallpaper
+
+| Key | Action |
+| --- | --- |
+| `Mod+t` or `Mod+Ctrl+Shift+Space` | Theme picker |
+| `Mod+Ctrl+t` | Next theme |
+| `Mod+Shift+b` | Wallpaper picker |
+| `Mod+Ctrl+Space` | Next wallpaper (current theme) |
+
+### Windows and workspaces
+
+| Key | Action |
+| --- | --- |
+| `Mod+h/j/k/l` or arrows | Focus left/down/up/right |
+| `Mod+Shift+h/j/k/l` or `Mod+Shift+arrows` | Move window |
+| `Mod+1…0` / `Mod+Shift+1…0` | Go to / move to workspace 1…10 |
+| `Mod+a` / `Mod+-` | Split vertical / horizontal |
+| `Mod+s` / `Mod+w` / `Mod+e` | Stacking / tabbed / toggle split |
+| `Mod+=` | Toggle split layout |
+| `Mod+f` | Fullscreen |
 | `Mod+Shift+Space` | Toggle floating |
-| `Mod+Escape` | Lock the screen |
-| `Mod+Shift+s` | Capture an area with Flameshot |
-| `Mod+Shift+f` | Capture the full screen |
-| `Mod+m` | Open ncspot |
-| `Mod+Shift+a` | Open ani-cli |
-| `Mod+Shift+v` | Open lobster |
+| `Mod+Space` | Focus tiling ↔ floating |
+| `Mod+c` | Centre floating window |
+| `Mod+Shift+q` | Close window |
+| `Mod+Shift+r` | Restart i3 |
 
-Polybar’s Wi-Fi, Bluetooth, and power modules open Rofi menus when clicked. Right-click the volume module to open `pavucontrol`.
-
-### tmux
-
-The prefix is `Ctrl+g`.
+### System
 
 | Key | Action |
 | --- | --- |
-| `Ctrl+g`, `p`, `n` | Split a pane to the right |
-| `Ctrl+g`, `p`, `l/r/u/d` | Split left/right/up/down in the current directory |
-| `Ctrl+g`, `t`, `n` | Create a window/tab |
-| `Ctrl+g`, `t`, `h/l` | Select previous/next window |
-| `Ctrl+h/j/k/l` | Navigate panes and Neovim splits |
-| `Alt+H/L` | Select previous/next tmux window |
-| `Ctrl+g`, `[` | Enter vi-style copy mode |
+| `Mod+Escape` | Lock |
+| `Mod+Shift+s` / `Mod+Shift+f` / `Mod+Shift+c` | Screenshot area / full / area→clipboard |
+| `XF86 brightness / volume / media keys` | brightnessctl, pactl, playerctl |
 
-Shell aliases: `tn <name>` creates a session, `ta <name>` attaches, `tl` lists, and `tk <name>` kills one. TPM installs Catppuccin, vim-tmux-navigator, yank, resurrect, continuum, and sensible into `~/.tmux/plugins/`; plugin checkouts are not repository submodules.
+Polybar: click WiFi / Bluetooth / power for their menus; right-click volume for `pavucontrol`.
 
-## Tool versions
+### tmux (prefix `Ctrl+g`)
 
-The source of truth is `mise/.config/mise/config.toml`. It currently includes Node.js 24/22 LTS, Java 21/17, Python 3.12, Maven 3.9, Gradle 8, pnpm, Neovim, GitHub CLI, lazygit, lazydocker, and the CLI/TUI tools listed there.
+| Key | Action |
+| --- | --- |
+| `Ctrl+g p` then `n/r/l/u/d` | Split right/right/left/up/down in the current directory |
+| `Ctrl+g t` then `n/h/l` | New window / previous / next |
+| `Ctrl+h/j/k/l` | Move between panes and Neovim splits |
+| `Alt+H` / `Alt+L` | Previous / next window |
+| `Ctrl+g [` | Copy mode (vi keys; `v` select, `y` yank) |
 
-Add a tool to the manifest, then run:
-
-```bash
-./update.sh --local
-```
+Shell: `tn <name>` new, `ta <name>` attach, `tl` list, `tk <name>` kill.
 
 ## Repository layout
 
 ```text
 .
-├── install.sh                  # full and component installer
-├── update.sh                   # non-destructive update workflow
-├── install/                    # package installers and Stow deployer
-├── scripts/verify.sh           # local/CI verification entry point
-├── tests/                      # temp-HOME integration tests
-├── .github/workflows/          # GitHub Actions verification
-├── mise/.config/mise/          # language and tool manifest
-├── i3/.config/i3/              # i3 config and session scripts
-├── polybar/.config/polybar/    # bar launcher and Rofi helper scripts
-├── themes/.config/themes/      # source themes, templates, and renderer
-├── wallpapers/                 # wallpapers copied during setup/update
-├── pvim/.config/pvim/          # the only Git submodule
-└── <package>/<target path>     # GNU Stow package layout
+├── install.sh / update.sh        # entry points
+├── install/                      # package installers, Stow deployer (DOTFILES_PACKAGES), setup steps
+├── scripts/verify.sh             # local + CI verification
+├── tests/                        # temp-HOME integration tests
+├── bin/.local/bin/dots-*         # all commands
+├── themes/.config/themes/        # themes/<id>.conf + templates/<app>.template
+├── wallpapers/<theme-id>/        # per-theme wallpapers, plus shared/
+├── i3/  polybar/  kitty/  tmux/  picom/  zsh/  bash/  git/  mise/  broot/  vim/  idea/  nvim/
+└── pvim/.config/pvim/            # Neovim config (git submodule)
 ```
 
-To add another managed config, mirror its home-relative path in a package directory, add the package name to `DOTFILES_PACKAGES` in `install/deploy.sh`, and add a fresh/existing-home assertion when the behavior is significant.
+Generated and untracked: `polybar/config.ini`, `kitty/theme.conf`, `dunst/dunstrc`, `rofi/config.rasi`, `i3/theme.conf`, `tmux/theme.conf`.
 
-## Contributing
+## Verify before committing
 
-1. Fork and clone with `--recurse-submodules`.
-2. Create a focused branch.
-3. Run `./scripts/verify.sh`.
-4. Use [Conventional Commits](https://www.conventionalcommits.org/) such as `fix(update): preserve dirty worktrees`.
-5. Open a pull request describing behavior changes and manual desktop testing.
+```bash
+./scripts/verify.sh
+```
 
-Project-specific engineering and commit rules are in [`CLAUDE.md`](./CLAUDE.md). CI must pass before changes reach `main`.
+Conventions and commit rules: [`CLAUDE.md`](./CLAUDE.md).
 
 ## Troubleshooting
 
-- Restore an overwritten conflict from the newest directory under `~/.local/state/dotfiles/backups/`.
-- Run `./install.sh stow --dry-run` to inspect link conflicts.
-- Run `./update.sh --check` to diagnose repository or config failures without deployment.
-- If an update exits `2`, inspect `git status`; local work was preserved and remote sync was skipped.
-- If a plugin is missing, run `~/.tmux/plugins/tpm/bin/install_plugins` or `./update.sh`.
-- Restart the shell after Zsh changes; use `tmux source-file ~/.tmux.conf` after tmux-only edits.
+- Theme looks half-applied → `dots-theme-set $(dots-theme-current)`; check `~/.config/<app>/theme.conf` exists.
+- Wallpaper missing after a theme switch → `./install.sh wallpapers` (the theme directory in `~/Pictures/wallpapers/` is empty).
+- A `dots-*` command is missing → `./install.sh stow`.
+- Restore an overwritten file from `~/.local/state/dotfiles/backups/`.
+- `./update.sh` exits `2` → local changes were preserved and upstream sync skipped; commit and rerun.
 
 ## License
 

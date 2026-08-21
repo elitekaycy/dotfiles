@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Rofi power menu.
+set -Eeuo pipefail
+
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+menu() {
+    rofi -dmenu -i -p "$1" -no-custom \
+        -theme-str 'window { width: 22em; }' \
+        -theme-str "listview { lines: $2; }"
+}
+
+confirm() {
+    [[ "$(printf 'Yes\nNo\n' | menu "Confirm $1?" 2)" == "Yes" ]]
+}
+
+chosen="$(printf '%s\n' "  Lock" "󰍃  Logout" "󰤄  Suspend" "󰒲  Hibernate" "  Reboot" "  Shutdown" | menu "Power" 6)" || exit 0
+
+case "${chosen##*  }" in
+    Lock)      "$BIN_DIR/dots-lock" ;;
+    Logout)    confirm logout && i3-msg exit ;;
+    Suspend)   "$BIN_DIR/dots-lock" && systemctl suspend ;;
+    Hibernate) "$BIN_DIR/dots-lock" && systemctl hibernate ;;
+    Reboot)    confirm reboot && systemctl reboot ;;
+    Shutdown)  confirm shutdown && systemctl poweroff ;;
+esac

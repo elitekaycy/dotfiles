@@ -14,13 +14,15 @@ DOTFILES_PACKAGES=(
     tmux
     nvim
     pvim
-    rofi
-    dunst
+    bin
     picom
     polybar
     themes
     git
     mise
+    broot
+    vim
+    idea
 )
 
 _dotfiles_backup_dir=""
