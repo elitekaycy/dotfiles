@@ -22,15 +22,15 @@ save_layout() {
     file="$(layout_file)"
     mkdir -p "$LAYOUT_DIR"
     while IFS= read -r line; do
-        set -- $line
-        local output="$1" state="$2"
+        local output state
+        read -r output state _ <<< "$line"
         if [[ "$state" == connected ]]; then
-            local geo primary="" rotate="normal"
+            local geo rotate="normal"
             geo="$(grep -oE '[0-9]+x[0-9]+\+[0-9]+\+[0-9]+' <<< "$line" || true)"
-            [[ "$line" == *" primary "* ]] && primary="--primary"
             for r in left right inverted; do [[ " $line " == *" $r ("* ]] && rotate="$r"; done
             if [[ -n "$geo" ]]; then
-                args+=(--output "$output" --mode "${geo%%+*}" --pos "${geo#*+}" --rotate "$rotate" $primary)
+                args+=(--output "$output" --mode "${geo%%+*}" --pos "${geo#*+}" --rotate "$rotate")
+                [[ "$line" == *" primary "* ]] && args+=(--primary)
             else
                 args+=(--output "$output" --off)
             fi
