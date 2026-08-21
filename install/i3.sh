@@ -31,7 +31,8 @@ install_i3() {
                 dunst \
                 playerctl \
                 xss-lock \
-                polybar
+                polybar \
+                papirus-icon-theme
             ;;
         fedora)
             pkg_install \
@@ -57,7 +58,8 @@ install_i3() {
                 dunst \
                 playerctl \
                 xss-lock \
-                polybar
+                polybar \
+                papirus-icon-theme
             ;;
         arch)
             pkg_install \
@@ -83,7 +85,8 @@ install_i3() {
                 dunst \
                 playerctl \
                 xss-lock \
-                polybar
+                polybar \
+                papirus-icon-theme
             ;;
     esac
 

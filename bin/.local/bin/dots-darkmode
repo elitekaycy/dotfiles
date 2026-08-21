@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Force dark mode everywhere: GTK (gsettings + settings.ini are stowed),
+# the desktop portal, and every Zen / Firefox profile via user.js.
+set -Eeuo pipefail
+
+if command -v gsettings >/dev/null; then
+    gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
+    gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark' 2>/dev/null || true
+    gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark' 2>/dev/null || true
+fi
+
+write_user_js() {
+    local profile="$1"
+    [[ -d "$profile" ]] || return 0
+    cat > "$profile/user.js" <<'JS'
+// Managed by dots-darkmode - dark UI and dark web content
+user_pref("ui.systemUsesDarkTheme", 1);
+user_pref("layout.css.prefers-color-scheme.content-override", 0);
+user_pref("browser.theme.content-theme", 0);
+user_pref("browser.theme.toolbar-theme", 0);
+user_pref("browser.in-content.dark-mode", true);
+user_pref("widget.gtk.overlay-scrollbars.enabled", true);
+JS
+    echo "dark user.js -> ${profile#"$HOME"/}"
+}
+
+for ini in "$HOME/.zen/profiles.ini" "$HOME/.mozilla/firefox/profiles.ini" "$HOME/snap/firefox/common/.mozilla/firefox/profiles.ini"; do
+    [[ -f "$ini" ]] || continue
+    base="$(dirname "$ini")"
+    while IFS='=' read -r key value; do
+        [[ "$key" == "Path" ]] || continue
+        if [[ "$value" == /* ]]; then write_user_js "$value"; else write_user_js "$base/$value"; fi
+    done < "$ini"
+done
+
+echo "Dark mode set. Restart browsers to pick up user.js."

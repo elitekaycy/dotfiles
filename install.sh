@@ -22,6 +22,7 @@ source "$INSTALL_DIR/docker.sh"
 source "$INSTALL_DIR/chrome.sh"
 source "$INSTALL_DIR/languages.sh"
 source "$INSTALL_DIR/nvidia.sh"
+source "$INSTALL_DIR/zen.sh"
 source "$INSTALL_DIR/setup.sh"
 
 # Ensure submodules are initialized (for pvim)
@@ -58,6 +59,8 @@ show_help() {
     echo "  slack      Install Slack as web app"
     echo "  media      Spotify TUI, ani-cli, lobster (movies)"
     echo "  wallpapers Copy wallpapers"
+    echo "  zen        Zen browser policy (Vimium) when zen is installed"
+    echo "  darkmode   Force dark mode for GTK and Zen/Firefox profiles"
     echo ""
 }
 
@@ -109,6 +112,8 @@ main() {
     setup_tmux
     setup_pvim
     set_zsh_default
+    install_zen_policy
+    "$HOME/.local/bin/dots-darkmode"
 
     echo ""
     echo -e "${GREEN}╔═══════════════════════════════════════╗${NC}"
@@ -191,6 +196,12 @@ case "${1:-}" in
         ;;
     wallpapers)
         setup_wallpapers
+        ;;
+    zen)
+        install_zen_policy
+        ;;
+    darkmode)
+        "$HOME/.local/bin/dots-darkmode"
         ;;
     *)
         log_error "Unknown component: $1"

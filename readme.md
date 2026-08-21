@@ -115,6 +115,12 @@ wallpapers/
 
 `./install.sh wallpapers` copies the tree to `~/Pictures/wallpapers/` additively, so machine-local extras dropped there survive updates. `Mod+Shift+b` lists everything; `Mod+Ctrl+Space` cycles the current theme's set.
 
+## Dark mode and browser
+
+Everything is dark by default: GTK 3/4 (`gtk/` package: Adwaita-dark, Papirus-Dark icons), the desktop portal (`portals.conf` → gtk, which is how browsers learn the colour scheme under i3), and every Zen/Firefox profile (`dots-darkmode` writes a `user.js` forcing dark UI *and* dark web content). Re-run `dots-darkmode` after creating a new browser profile.
+
+Browser: **Zen** (`Mod+z`), Firefox-based with built-in split view, compact mode and workspaces. `./install.sh zen` drops an enterprise policy into `/opt/zen/distribution/` that installs **Vimium** automatically: `f` to hint-click links, `o` to search/open, `J`/`K` tabs, `/` find, `gg`/`G`, `H`/`L` back/forward. For a heavier, fully vim-modal setup swap Vimium for Tridactyl in `install/zen-policies.json`.
+
 ## Monitors
 
 Layouts are remembered **per set of connected outputs** in `~/.config/monitors/<outputs>.sh` (e.g. `eDP-1-2+HDMI-0.sh`, plain xrandr, editable).

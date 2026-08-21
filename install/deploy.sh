@@ -23,6 +23,7 @@ DOTFILES_PACKAGES=(
     broot
     vim
     idea
+    gtk
 )
 
 _dotfiles_backup_dir=""
