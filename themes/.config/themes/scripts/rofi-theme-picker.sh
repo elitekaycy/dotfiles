@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-#
-# Rofi Theme Picker - Select and apply themes via rofi
-#
+# Rofi theme picker. Type to filter by name or by "dark"/"light".
+set -Eeuo pipefail
 
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 THEMES_DIR="$CONFIG_HOME/themes"
@@ -9,69 +8,39 @@ THEMES_CONF_DIR="$THEMES_DIR/themes"
 SCRIPTS_DIR="$THEMES_DIR/scripts"
 CURRENT_THEME_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/theme"
 
-# Get current theme
-CURRENT=""
-if [[ -f "$CURRENT_THEME_FILE" ]]; then
-    CURRENT=$(cat "$CURRENT_THEME_FILE")
-fi
+current="$(cat "$CURRENT_THEME_FILE" 2>/dev/null || true)"
 
-# Build menu items from theme files
-# Format: "Theme Name (type)"
-build_menu() {
-    for theme_file in "$THEMES_CONF_DIR"/*.conf; do
-        [[ -f "$theme_file" ]] || continue
+theme_ids=()
+rows=()
+for theme_file in "$THEMES_CONF_DIR"/*.conf; do
+    [[ -f "$theme_file" ]] || continue
+    theme_id="$(basename "$theme_file" .conf)"
+    theme_name="$theme_id"
+    theme_type="dark"
 
-        local theme_id
-        theme_id=$(basename "$theme_file" .conf)
+    while IFS='=' read -r key value; do
+        value="${value%\"}"; value="${value#\"}"
+        case "$key" in
+            THEME_NAME) theme_name="$value" ;;
+            THEME_TYPE) theme_type="$value" ;;
+        esac
+    done < "$theme_file"
 
-        # Source the theme to get the display name and type
-        local theme_name=""
-        local theme_type=""
-        while IFS='=' read -r key value; do
-            # Remove leading/trailing whitespace and quotes
-            value="${value#\"}"
-            value="${value%\"}"
-            value="${value#\'}"
-            value="${value%\'}"
-            value="${value#[[:space:]]}"
-            value="${value%[[:space:]]}"
+    icon=""
+    [[ "$theme_type" == "light" ]] && icon=""
+    marker=""
+    [[ "$theme_id" == "$current" ]] && marker="  "
 
-            case "$key" in
-                THEME_NAME*) theme_name="$value" ;;
-                THEME_TYPE*) theme_type="$value" ;;
-            esac
-        done < "$theme_file"
+    theme_ids+=("$theme_id")
+    rows+=("$icon  $theme_name$marker  ($theme_type)")
+done
 
-        # Default values if not found
-        [[ -z "$theme_name" ]] && theme_name="$theme_id"
-        [[ -z "$theme_type" ]] && theme_type="dark"
+[[ ${#rows[@]} -gt 0 ]] || exit 0
 
-        # Add marker for current theme
-        local marker=""
-        [[ "$theme_id" == "$CURRENT" ]] && marker=" *"
+index="$(printf '%s\n' "${rows[@]}" | rofi -dmenu -i -p "Theme" \
+    -format 'i' -no-custom \
+    -theme-str 'window {width: 26em;}' \
+    -theme-str 'listview {lines: 10;}')" || exit 0
 
-        # Icon based on theme type
-        local icon=""
-        [[ "$theme_type" == "light" ]] && icon="" || icon=""
-
-        echo "$icon  $theme_name$marker|$theme_id"
-    done
-}
-
-# Show rofi menu
-selected=$(build_menu | rofi -dmenu -i -p "Theme" \
-    -theme-str 'window {width: 400px;}' \
-    -theme-str 'listview {lines: 10;}' \
-    -format 's' \
-    -no-custom)
-
-# Exit if nothing selected
-[[ -z "$selected" ]] && exit 0
-
-# Extract theme ID from selection (after the |)
-theme_id="${selected##*|}"
-
-# Apply the selected theme
-if [[ -n "$theme_id" ]]; then
-    "$SCRIPTS_DIR/apply-theme.sh" "$theme_id"
-fi
+[[ -n "$index" ]] || exit 0
+exec "$SCRIPTS_DIR/apply-theme.sh" "${theme_ids[$index]}"

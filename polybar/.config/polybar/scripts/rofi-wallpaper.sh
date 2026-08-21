@@ -3,6 +3,7 @@
 # Rofi Wallpaper Picker - Select and apply wallpapers
 #
 
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 WALLPAPER_DIR="$HOME/Pictures/wallpapers"
 
 # Create directory if it doesn't exist
@@ -38,15 +39,13 @@ selected=$(build_menu | rofi -dmenu -i -p "Wallpaper" \
 wallpaper_path="$WALLPAPER_DIR/$selected"
 
 if [[ -f "$wallpaper_path" ]]; then
-    if [[ -x "$HOME/.config/i3/wallpaper-setup.sh" ]]; then
-        "$HOME/.config/i3/wallpaper-setup.sh" "$wallpaper_path"
+    echo "$wallpaper_path" > "$CONFIG_HOME/current-wallpaper"
+    if [[ -x "$CONFIG_HOME/i3/wallpaper-setup.sh" ]]; then
+        "$CONFIG_HOME/i3/wallpaper-setup.sh" "$wallpaper_path"
     else
         feh --bg-fill "$wallpaper_path"
     fi
     notify-send "Wallpaper" "Applied: $selected" -i preferences-desktop-wallpaper
-
-    # Save current wallpaper for persistence
-    echo "$wallpaper_path" > "$HOME/.config/current-wallpaper"
 else
     notify-send "Wallpaper Picker" "File not found: $selected" -i dialog-error
 fi

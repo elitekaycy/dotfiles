@@ -84,6 +84,7 @@ apply_template() {
     content="${content//\{\{THEME_NAME\}\}/$THEME_NAME}"
     content="${content//\{\{THEME_TYPE\}\}/$THEME_TYPE}"
     content="${content//\{\{BG\}\}/$BG}"
+    content="${content//\{\{BG_HEX\}\}/${BG#\#}}"
     content="${content//\{\{BG_ALT\}\}/$BG_ALT}"
     content="${content//\{\{FG\}\}/$FG}"
     content="${content//\{\{FG_DIM\}\}/$FG_DIM}"
@@ -109,6 +110,8 @@ apply_template "$TEMPLATES_DIR/polybar.template" "$CONFIG_HOME/polybar/config.in
 apply_template "$TEMPLATES_DIR/kitty.template" "$CONFIG_HOME/kitty/theme.conf"
 apply_template "$TEMPLATES_DIR/dunst.template" "$CONFIG_HOME/dunst/dunstrc"
 apply_template "$TEMPLATES_DIR/rofi.template" "$CONFIG_HOME/rofi/config.rasi"
+apply_template "$TEMPLATES_DIR/i3.template" "$CONFIG_HOME/i3/theme.conf"
+apply_template "$TEMPLATES_DIR/tmux.template" "$CONFIG_HOME/tmux/theme.conf"
 
 mkdir -p "$HOME/.local/share/nvim" "$STATE_DIR"
 printf '%s\n' "$NVIM_THEME" > "$HOME/.local/share/nvim/pvim_theme.txt"
@@ -149,6 +152,9 @@ if [[ "$RELOAD_APPS" == "true" && -n "${DISPLAY:-}" ]]; then
     fi
 
     command -v i3-msg >/dev/null && i3-msg reload >/dev/null 2>&1 || true
+    if command -v tmux >/dev/null && tmux list-sessions >/dev/null 2>&1; then
+        tmux source-file "$HOME/.tmux.conf" >/dev/null 2>&1 || true
+    fi
     command -v notify-send >/dev/null && notify-send "Theme Switcher" "Applied theme: $THEME_NAME" -i preferences-desktop-theme || true
 fi
 

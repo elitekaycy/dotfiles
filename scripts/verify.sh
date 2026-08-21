@@ -28,14 +28,14 @@ log "checking structured config"
 while IFS= read -r json_file; do
     jq empty "$json_file"
 done < <(git ls-files --cached --others --exclude-standard '*.json' | sort -u)
-python3 - <<'PY'
-from pathlib import Path
-import tomllib
-for path in Path('.').rglob('*.toml'):
-    if '.git' not in path.parts:
-        with path.open('rb') as stream:
+git ls-files --cached --others --exclude-standard '*.toml' | sort -u | python3 -c '
+import sys, tomllib
+for line in sys.stdin:
+    path = line.strip()
+    if path:
+        with open(path, "rb") as stream:
             tomllib.load(stream)
-PY
+'
 
 log "checking submodule metadata"
 mapfile -t gitlinks < <(comm -23 \
@@ -57,6 +57,8 @@ for generated in \
     kitty/.config/kitty/theme.conf \
     polybar/.config/polybar/config.ini \
     rofi/.config/rofi/config.rasi \
+    i3/.config/i3/theme.conf \
+    tmux/.config/tmux/theme.conf \
     themes/.config/themes/current; do
     if git ls-files --error-unmatch "$generated" >/dev/null 2>&1 && [[ -e "$generated" || -L "$generated" ]]; then
         fail "generated file is tracked: $generated"

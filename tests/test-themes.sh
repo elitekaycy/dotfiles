@@ -22,7 +22,9 @@ for theme_file in "$ROOT"/themes/.config/themes/themes/*.conf; do
         "$TEST_HOME/.config/polybar/config.ini" \
         "$TEST_HOME/.config/kitty/theme.conf" \
         "$TEST_HOME/.config/dunst/dunstrc" \
-        "$TEST_HOME/.config/rofi/config.rasi"; then
+        "$TEST_HOME/.config/rofi/config.rasi" \
+        "$TEST_HOME/.config/i3/theme.conf" \
+        "$TEST_HOME/.config/tmux/theme.conf"; then
         printf 'test-themes: unresolved template variable in %s\n' "$theme_id" >&2
         exit 1
     fi

@@ -12,7 +12,6 @@ install_i3() {
                 i3 \
                 i3lock \
                 rofi \
-                dmenu \
                 feh \
                 brightnessctl \
                 network-manager-gnome \
@@ -39,7 +38,6 @@ install_i3() {
                 i3 \
                 i3lock \
                 rofi \
-                dmenu \
                 feh \
                 brightnessctl \
                 network-manager-applet \
@@ -66,7 +64,6 @@ install_i3() {
                 i3-wm \
                 i3lock \
                 rofi \
-                dmenu \
                 feh \
                 brightnessctl \
                 network-manager-applet \

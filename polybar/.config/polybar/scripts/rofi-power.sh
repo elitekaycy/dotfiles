@@ -1,5 +1,9 @@
-#!/bin/bash
-# Rofi Power Menu - Tokyo Night themed
+#!/usr/bin/env bash
+# Rofi power menu
+
+lock_screen() {
+    "${XDG_CONFIG_HOME:-$HOME/.config}/themes/scripts/lock.sh"
+}
 
 # Options with icons
 lock="  Lock"
@@ -29,16 +33,16 @@ listview { lines: 2; }
 # Handle selection
 case "$chosen" in
     "$lock")
-        i3lock -c 1a1b26
+        lock_screen
         ;;
     "$logout")
         confirm_action "logout" && i3-msg exit
         ;;
     "$suspend")
-        i3lock -c 1a1b26 && systemctl suspend
+        lock_screen && systemctl suspend
         ;;
     "$hibernate")
-        i3lock -c 1a1b26 && systemctl hibernate
+        lock_screen && systemctl hibernate
         ;;
     "$reboot")
         confirm_action "reboot" && systemctl reboot
