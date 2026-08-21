@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+# Remember monitor layouts per set of connected outputs.
+#
+#   dots-monitors save      snapshot the current xrandr layout for the connected outputs
+#   dots-monitors apply     apply the saved layout for the connected outputs (default if none)
+#   dots-monitors arrange   open arandr, then save when it closes
+#   dots-monitors forget    delete the saved layout for the connected outputs
+#   dots-monitors key       print the layout key (e.g. eDP-1-2+HDMI-0)
+#
+# Layouts: ~/.config/monitors/<key>.sh   (plain xrandr commands, editable)
+set -Eeuo pipefail
+
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+LAYOUT_DIR="$CONFIG_HOME/monitors"
+
+connected() { xrandr --query | awk '/ connected/ { print $1 }' | sort; }
+layout_key() { connected | paste -sd+ -; }
+layout_file() { printf '%s/%s.sh\n' "$LAYOUT_DIR" "$(layout_key)"; }
+
+save_layout() {
+    local file args=() line
+    file="$(layout_file)"
+    mkdir -p "$LAYOUT_DIR"
+    while IFS= read -r line; do
+        set -- $line
+        local output="$1" state="$2"
+        if [[ "$state" == connected ]]; then
+            local geo primary="" rotate="normal"
+            geo="$(grep -oE '[0-9]+x[0-9]+\+[0-9]+\+[0-9]+' <<< "$line" || true)"
+            [[ "$line" == *" primary "* ]] && primary="--primary"
+            for r in left right inverted; do [[ " $line " == *" $r ("* ]] && rotate="$r"; done
+            if [[ -n "$geo" ]]; then
+                args+=(--output "$output" --mode "${geo%%+*}" --pos "${geo#*+}" --rotate "$rotate" $primary)
+            else
+                args+=(--output "$output" --off)
+            fi
+        else
+            args+=(--output "$output" --off)
+        fi
+    done < <(xrandr --query | grep -E ' (dis)?connected')
+    {
+        echo "#!/usr/bin/env bash"
+        echo "# Saved by dots-monitors on $(date '+%Y-%m-%d %H:%M') for: $(layout_key)"
+        printf 'xrandr'
+        printf ' %q' "${args[@]}"
+        echo
+    } > "$file"
+    chmod +x "$file"
+    echo "Saved $file"
+}
+
+default_layout() {
+    local outputs primary="" previous args=()
+    mapfile -t outputs < <(connected)
+    ((${#outputs[@]} > 0)) || return 0
+    primary="$(xrandr --query | awk '/ connected primary/ { print $1; exit }')"
+    if [[ -z "$primary" ]]; then
+        for o in "${outputs[@]}"; do case "$o" in eDP*|LVDS*) primary="$o"; break ;; esac; done
+    fi
+    [[ -n "$primary" ]] || primary="${outputs[0]}"
+    args=(--output "$primary" --auto --primary)
+    previous="$primary"
+    for o in "${outputs[@]}"; do
+        [[ "$o" != "$primary" ]] || continue
+        args+=(--output "$o" --auto --right-of "$previous")
+        previous="$o"
+    done
+    xrandr "${args[@]}" >/dev/null 2>&1 || true
+}
+
+apply_layout() {
+    local file
+    file="$(layout_file)"
+    if [[ -x "$file" ]]; then
+        "$file" >/dev/null 2>&1 || default_layout
+    else
+        default_layout
+    fi
+}
+
+case "${1:-apply}" in
+    save) save_layout ;;
+    apply) apply_layout ;;
+    key) layout_key ;;
+    forget) rm -fv "$(layout_file)" ;;
+    arrange)
+        command -v arandr >/dev/null || { echo "arandr is not installed" >&2; exit 1; }
+        arandr
+        save_layout
+        command -v notify-send >/dev/null && notify-send "Monitors" "Layout saved for $(layout_key)" || true
+        ;;
+    *) sed -n '2,10p' "$0"; exit 2 ;;
+esac
