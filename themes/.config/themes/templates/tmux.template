@@ -19,9 +19,15 @@ set -g window-status-bell-style "fg={{RED}}"
 set -g status-right-length 60
 set -g status-right "#[fg={{FG_DIM}}] #{?client_prefix,#[fg={{RED}}] ,}#[fg={{FG_DIM}}]%a %d %b #[fg={{FG}},bold]%H:%M "
 
-set -g pane-border-style "fg={{BG_ALT}}"
+# Pane separators: solid full-length coloured lines, brighter on the active pane
+set -g pane-border-lines heavy
+set -g pane-border-style "fg={{FG_DIM}}"
 set -g pane-active-border-style "fg={{PRIMARY}}"
-set -g pane-border-lines single
+set -g pane-border-indicators colour
+
+# Terminal/tab title = tmux session name, not the launching script
+set -g set-titles on
+set -g set-titles-string "#S"
 
 set -g message-style "bg={{BG_ALT}},fg={{FG}}"
 set -g message-command-style "bg={{BG_ALT}},fg={{PRIMARY}}"
