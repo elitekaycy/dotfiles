@@ -2,7 +2,7 @@
 # Rofi Wi-Fi menu (NetworkManager).
 set -Eeuo pipefail
 
-current="$(nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '$1 == "yes" { print $2; exit }')"
+current="$(nmcli -t -f active,ssid dev wifi list --rescan no 2>/dev/null | awk -F: '$1 == "yes" { print $2; exit }')"
 wifi_dev="$(nmcli -t -f DEVICE,TYPE dev 2>/dev/null | awk -F: '$2 == "wifi" { print $1; exit }')"
 
 toggle="󰖩  Toggle WiFi"
@@ -20,7 +20,7 @@ while IFS=':' read -r ssid signal security; do
     mark=""
     [[ "$ssid" == "$current" ]] && mark="  󰄬"
     rows+=("$icon  $ssid$lock$mark")
-done < <(nmcli -t -f SSID,SIGNAL,SECURITY dev wifi list 2>/dev/null | grep -v '^:' | sort -t: -k2 -rn | awk -F: '!seen[$1]++')
+done < <(nmcli -t -f SSID,SIGNAL,SECURITY dev wifi list --rescan no 2>/dev/null | grep -v '^:' | sort -t: -k2 -rn | awk -F: '!seen[$1]++')
 
 chosen="$(printf '%s\n' "${rows[@]}" | rofi -dmenu -i -p "WiFi" -no-custom \
     -theme-str 'window { width: 32em; }' \
@@ -35,7 +35,10 @@ case "$chosen" in
         fi
         ;;
     "$scan")
-        nmcli dev wifi rescan && notify-send "WiFi" "Scanning..."
+        notify-send "WiFi" "Scanning..."
+        nmcli dev wifi rescan 2>/dev/null || true
+        sleep 3
+        exec "$0"
         ;;
     "$disconnect")
         [[ -n "$wifi_dev" ]] && nmcli dev disconnect "$wifi_dev" && notify-send "WiFi" "Disconnected"

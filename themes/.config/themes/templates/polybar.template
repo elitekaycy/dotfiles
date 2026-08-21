@@ -113,9 +113,9 @@ click-left = ~/.local/bin/dots-bluetooth
 type = internal/network
 interface-type = wireless
 interval = 3
-format-connected = <ramp-signal>
+format-connected = %{A1:~/.local/bin/dots-wifi:}<ramp-signal>%{A}
 format-connected-padding = 1
-format-disconnected = 󰤮
+format-disconnected = %{A1:~/.local/bin/dots-wifi:}󰤮%{A}
 format-disconnected-foreground = ${colors.dim}
 format-disconnected-padding = 1
 ramp-signal-0 = 󰤯
@@ -123,29 +123,28 @@ ramp-signal-1 = 󰤟
 ramp-signal-2 = 󰤢
 ramp-signal-3 = 󰤥
 ramp-signal-4 = 󰤨
-click-left = ~/.local/bin/dots-wifi
 
 [module/wired]
 type = internal/network
 interface-type = wired
 interval = 3
-format-connected = 󰀂
+format-connected = %{A1:~/.local/bin/dots-wifi:}󰀂%{A}
 format-connected-padding = 1
 format-disconnected =
 
 [module/pulseaudio]
 type = internal/pulseaudio
 use-ui-max = false
-format-volume = <ramp-volume>
+format-volume = %{A1:pavucontrol:}<ramp-volume>%{A}
 format-volume-padding = 1
+format-muted = %{A1:pavucontrol:}<label-muted>%{A}
+format-muted-padding = 1
 label-muted = 󰝟
 label-muted-foreground = ${colors.dim}
-label-muted-padding = 1
 ramp-volume-0 = 󰕿
 ramp-volume-1 = 󰖀
 ramp-volume-2 = 󰕾
 ramp-headphones-0 = 󰋋
-click-left = pavucontrol
 click-right = pactl set-sink-mute @DEFAULT_SINK@ toggle
 scroll-up = pactl set-sink-volume @DEFAULT_SINK@ +5%
 scroll-down = pactl set-sink-volume @DEFAULT_SINK@ -5%
@@ -153,9 +152,8 @@ scroll-down = pactl set-sink-volume @DEFAULT_SINK@ -5%
 [module/cpu]
 type = internal/cpu
 interval = 5
-format = 󰍛
+format = %{A1:kitty -e btop:}󰍛%{A}
 format-padding = 1
-click-left = kitty -e btop
 
 [module/battery]
 type = internal/battery
@@ -165,13 +163,13 @@ full-at = 98
 low-at = 15
 poll-interval = 5
 
-format-charging = <animation-charging>
+format-charging = %{A1:~/.local/bin/dots-power:}<animation-charging>%{A}
 format-charging-padding = 1
-format-discharging = <ramp-capacity>
+format-discharging = %{A1:~/.local/bin/dots-power:}<ramp-capacity>%{A}
 format-discharging-padding = 1
-format-full = 󰂅
+format-full = %{A1:~/.local/bin/dots-power:}󰂅%{A}
 format-full-padding = 1
-format-low = <ramp-capacity> <label-low>
+format-low = %{A1:~/.local/bin/dots-power:}<ramp-capacity> <label-low>%{A}
 format-low-foreground = ${colors.alert}
 format-low-padding = 1
 label-low = %percentage%%
@@ -198,8 +196,6 @@ animation-charging-7 = 󰂊
 animation-charging-8 = 󰂋
 animation-charging-9 = 󰂅
 animation-charging-framerate = 750
-
-click-left = ~/.local/bin/dots-power
 
 [settings]
 screenchange-reload = true
