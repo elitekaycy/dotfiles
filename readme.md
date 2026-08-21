@@ -168,7 +168,8 @@ dots-monitors forget    # back to the default arrangement
 | `Mod+a` / `Mod+-` | Split vertical / horizontal |
 | `Mod+s` / `Mod+w` / `Mod+e` | Stacking / tabbed / toggle split |
 | `Mod+=` | Toggle split layout |
-| `Mod+f` | Fullscreen |
+| `Mod+f` | Fullscreen (hides the bar) |
+| `Mod+Shift+m` | Maximize but keep the bar: no gaps/borders on this workspace (toggle) |
 | `Mod+Shift+Space` | Toggle floating |
 | `Mod+Space` | Focus tiling ↔ floating |
 | `Mod+c` | Centre floating window |

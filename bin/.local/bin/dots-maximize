@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Toggle "maximized" for the current workspace: no gaps, no borders, bar stays.
+# Unlike fullscreen (Mod+f) the bar remains visible and clickable.
+set -Eeuo pipefail
+
+STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/dots-maximize"
+mkdir -p "$STATE_DIR"
+ws="$(i3-msg -t get_workspaces | grep -oE '"num":[0-9]+,"name":"[^"]*","visible":(true|false),"focused":true' | grep -oE '"num":[0-9]+' | cut -d: -f2)"
+state="$STATE_DIR/$ws"
+
+if [[ -f "$state" ]]; then
+    rm -f "$state"
+    i3-msg "gaps inner current set 10, gaps outer current set 4" >/dev/null
+    i3-msg "[workspace=__focused__] border pixel 3" >/dev/null
+else
+    touch "$state"
+    i3-msg "gaps inner current set 0, gaps outer current set 0" >/dev/null
+    i3-msg "[workspace=__focused__] border none" >/dev/null
+fi

@@ -72,6 +72,8 @@ bindsym $mod+Shift+r restart
 bindsym $mod+z exec zen
 bindsym $mod+b exec firefox
 bindsym $mod+f fullscreen toggle
+# Maximize but keep the bar: drops gaps and borders on this workspace (toggle)
+bindsym $mod+Shift+m exec --no-startup-id ~/.local/bin/dots-maximize
 
 # Launch tmux sessions (dots-session --menu lists them all)
 bindsym $mod+Shift+w exec kitty -e ~/.local/bin/dots-session work
