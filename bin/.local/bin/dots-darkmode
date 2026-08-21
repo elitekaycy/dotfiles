@@ -21,7 +21,7 @@ user_pref("browser.theme.toolbar-theme", 0);
 user_pref("browser.in-content.dark-mode", true);
 user_pref("widget.gtk.overlay-scrollbars.enabled", true);
 JS
-    echo "dark user.js -> ${profile#"$HOME"/}"
+    echo "prefs -> ${profile#"$HOME"/}"
 }
 
 for ini in "$HOME/.zen/profiles.ini" "$HOME/.mozilla/firefox/profiles.ini" "$HOME/snap/firefox/common/.mozilla/firefox/profiles.ini"; do
