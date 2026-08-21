@@ -166,7 +166,7 @@ wallpapers/
 | `Mod+Shift+s` / `Mod+Shift+f` / `Mod+Shift+c` | Screenshot area / full / area→clipboard |
 | `XF86 brightness / volume / media keys` | brightnessctl, pactl, playerctl |
 
-Polybar: click WiFi / Bluetooth / power for their menus; right-click volume for `pavucontrol`.
+Polybar (icons only, left → right): `≡` menu (click: `dots-menu`, right-click: Kitty) · workspaces (dot = active) · clock (click: `dots-menu`) · tray · bluetooth (`dots-bluetooth`) · wifi (`dots-wifi`) · audio (click: `pavucontrol`, right-click: mute, scroll: volume) · cpu (`btop`) · battery (`dots-power`).
 
 ### tmux (prefix `Ctrl+g`)
 

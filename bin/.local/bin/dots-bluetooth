@@ -7,7 +7,7 @@ connected="$(bluetoothctl devices Connected 2>/dev/null || true)"
 paired="$(bluetoothctl devices Paired 2>/dev/null || true)"
 
 toggle="󰂯  Toggle Bluetooth"
-scan="  Scan Devices"
+scan="󰑐  Scan Devices"
 disconnect_all="󰂲  Disconnect All"
 
 rows=("$toggle" "$scan")

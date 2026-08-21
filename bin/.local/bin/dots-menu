@@ -15,7 +15,7 @@ menu() {
 }
 
 wallpaper_menu() {
-    case "$(printf '%s\n' "  Pick" "  Next" "  Theme default" | menu "Wallpaper" 3)" in
+    case "$(printf '%s\n' "󰸉  Pick" "󰒭  Next" "󰑓  Theme default" | menu "Wallpaper" 3)" in
         Pick) exec "$BIN_DIR/dots-bg-menu" ;;
         Next) exec "$BIN_DIR/dots-bg-next" ;;
         "Theme default")
@@ -27,7 +27,7 @@ wallpaper_menu() {
 }
 
 theme_menu() {
-    case "$(printf '%s\n' "  Pick" "  Next" | menu "Theme" 2)" in
+    case "$(printf '%s\n' "󰏘  Pick" "󰒭  Next" | menu "Theme" 2)" in
         Pick) exec "$BIN_DIR/dots-theme-menu" ;;
         Next) exec "$BIN_DIR/dots-theme-next" ;;
         *) main_menu ;;
@@ -35,7 +35,7 @@ theme_menu() {
 }
 
 screenshot_menu() {
-    case "$(printf '%s\n' "  Area" "  Full screen" "  Area to clipboard" | menu "Screenshot" 3)" in
+    case "$(printf '%s\n' "󰩭  Area" "󰹑  Full screen" "󰅇  Area to clipboard" | menu "Screenshot" 3)" in
         Area) exec "$BIN_DIR/dots-screenshot" area ;;
         "Full screen") exec "$BIN_DIR/dots-screenshot" full ;;
         "Area to clipboard") exec "$BIN_DIR/dots-screenshot" clip ;;
@@ -46,16 +46,16 @@ screenshot_menu() {
 main_menu() {
     local rows=(
         "󰀻  Apps"
-        "  Theme"
-        "  Wallpaper"
-        "  Session"
-        "  Keybindings"
+        "󰏘  Theme"
+        "󰸉  Wallpaper"
+        "󰆍  Session"
+        "󰌌  Keybindings"
         "󰖩  WiFi"
         "󰂯  Bluetooth"
-        "  Screenshot"
-        "  Clipboard"
-        "  Lock"
-        "⏻  Power"
+        "󰄀  Screenshot"
+        "󰅇  Clipboard"
+        "󰌾  Lock"
+        "󰐥  Power"
     )
     case "$(printf '%s\n' "${rows[@]}" | menu "Menu" "${#rows[@]}")" in
         Apps)        exec rofi -show drun ;;

@@ -1,148 +1,161 @@
 ;==========================================================
-;   Polybar Config - {{THEME_NAME}}
+;   Polybar - {{THEME_NAME}}
+;   Omarchy-style: one flat monochrome bar, icons only.
 ;==========================================================
 
 [colors]
 background = {{BG}}
-background-alt = {{BG_ALT}}
 foreground = {{FG}}
+dim = {{FG_DIM}}
 primary = {{PRIMARY}}
-secondary = {{SECONDARY}}
 alert = {{RED}}
-disabled = {{FG_DIM}}
-green = {{GREEN}}
-yellow = {{YELLOW}}
-cyan = {{CYAN}}
-magenta = {{MAGENTA}}
 
 [bar/main]
 monitor = ${env:MONITOR:}
 width = 100%
-height = 36
+height = 28
 dpi = 96
 radius = 0
-offset-x = 0
-offset-y = 0
 bottom = false
 fixed-center = true
 override-redirect = false
+enable-ipc = true
+enable-struts = true
 
 background = ${colors.background}
 foreground = ${colors.foreground}
-
-line-size = 2
-
+line-size = 0
 border-size = 0
-border-color = #00000000
+padding-left = 1
+padding-right = 1
+module-margin = 0
+separator =
 
-padding-left = 2
-padding-right = 2
+font-0 = "JetBrainsMono Nerd Font:size=11;3"
+font-1 = "JetBrainsMono Nerd Font:size=13;3"
 
-module-margin = 1
-
-separator = ""
-separator-foreground = ${colors.disabled}
-
-font-0 = "JetBrainsMono Nerd Font:size=10;3"
-font-1 = "JetBrainsMono Nerd Font:size=12;3"
-
-modules-left = i3
-modules-center = date
-modules-right = network bluetooth pulseaudio battery power
+modules-left = menu workspaces
+modules-center = clock
+modules-right = tray bluetooth wifi wired pulseaudio cpu battery
 
 cursor-click = pointer
 cursor-scroll = ns-resize
 
-enable-ipc = true
-enable-struts = true
-
 ;==========================================================
-;   Modules
+;   Left
 ;==========================================================
 
-[module/i3]
+[module/menu]
+type = custom/text
+format = "%{T2}󰍜%{T-}"
+format-padding = 2
+click-left = ~/.local/bin/dots-menu
+click-right = kitty
+
+[module/workspaces]
 type = internal/i3
 pin-workspaces = true
 show-urgent = true
-strip-wsnumbers = true
 index-sort = true
+enable-scroll = false
 
-label-mode = " 󰉋 %mode% "
-label-mode-padding = 1
-label-mode-background = ${colors.alert}
+label-focused = 󱓻
+label-focused-foreground = ${colors.foreground}
+label-focused-padding = 1
 
-label-focused = " 󰉋 %name% "
-label-focused-foreground = ${colors.primary}
-label-focused-underline = ${colors.primary}
-label-focused-padding = 0
+label-unfocused = %index%
+label-unfocused-foreground = ${colors.dim}
+label-unfocused-padding = 1
 
-label-unfocused = " %index% "
-label-unfocused-foreground = ${colors.disabled}
-label-unfocused-padding = 0
+label-visible = %index%
+label-visible-foreground = ${colors.foreground}
+label-visible-padding = 1
 
-label-visible = " %index% "
-label-visible-foreground = ${colors.secondary}
-label-visible-underline = ${colors.secondary}
-label-visible-padding = 0
-
-label-urgent = " %index% "
+label-urgent = %index%
 label-urgent-foreground = ${colors.alert}
-label-urgent-underline = ${colors.alert}
-label-urgent-padding = 0
+label-urgent-padding = 1
 
-[module/date]
+label-mode = %mode%
+label-mode-foreground = ${colors.alert}
+label-mode-padding = 1
+
+;==========================================================
+;   Center
+;==========================================================
+
+[module/clock]
 type = internal/date
 interval = 30
+date = %A
+time = %H:%M
+label = %date% %time%
+click-left = ~/.local/bin/dots-menu
 
-date = %A %b %d
-time = %I:%M %p
+;==========================================================
+;   Right (icons only; click opens the matching rofi menu)
+;==========================================================
 
-label = " 󰥔 %date% %time% "
-label-foreground = ${colors.foreground}
-click-left = sh -c 'notify-send "$(date "+%A, %B %d")" "$(date "+%I:%M %p")"'
-
-[module/network]
-type = custom/script
-exec = ~/.config/polybar/scripts/network.sh
-interval = 5
-click-left = ~/.local/bin/dots-wifi
-format = <label>
-format-padding = 1
-label-maxlen = 12
-label-foreground = ${colors.cyan}
+[module/tray]
+type = internal/tray
+tray-spacing = 10px
+tray-size = 14
+tray-padding = 4
 
 [module/bluetooth]
 type = custom/script
 exec = ~/.config/polybar/scripts/bluetooth.sh
 interval = 5
-click-left = ~/.local/bin/dots-bluetooth
 format = <label>
 format-padding = 1
-label-maxlen = 4
-label-foreground = ${colors.primary}
+click-left = ~/.local/bin/dots-bluetooth
+
+[module/wifi]
+type = internal/network
+interface-type = wireless
+interval = 3
+format-connected = <ramp-signal>
+format-connected-padding = 1
+format-disconnected = 󰤮
+format-disconnected-foreground = ${colors.dim}
+format-disconnected-padding = 1
+ramp-signal-0 = 󰤯
+ramp-signal-1 = 󰤟
+ramp-signal-2 = 󰤢
+ramp-signal-3 = 󰤥
+ramp-signal-4 = 󰤨
+click-left = ~/.local/bin/dots-wifi
+
+[module/wired]
+type = internal/network
+interface-type = wired
+interval = 3
+format-connected = 󰀂
+format-connected-padding = 1
+format-disconnected =
 
 [module/pulseaudio]
 type = internal/pulseaudio
 use-ui-max = false
-
-format-volume = <ramp-volume> <label-volume>
-format-volume-foreground = ${colors.magenta}
+format-volume = <ramp-volume>
 format-volume-padding = 1
-
-label-volume = %percentage%%
-
 label-muted = 󰝟
-label-muted-foreground = ${colors.disabled}
+label-muted-foreground = ${colors.dim}
 label-muted-padding = 1
-
 ramp-volume-0 = 󰕿
 ramp-volume-1 = 󰖀
 ramp-volume-2 = 󰕾
-
-click-left = pactl set-sink-mute @DEFAULT_SINK@ toggle
-click-right = pavucontrol &
+ramp-headphones-0 = 󰋋
+click-left = pavucontrol
+click-right = pactl set-sink-mute @DEFAULT_SINK@ toggle
 scroll-up = pactl set-sink-volume @DEFAULT_SINK@ +5%
 scroll-down = pactl set-sink-volume @DEFAULT_SINK@ -5%
+
+[module/cpu]
+type = internal/cpu
+interval = 5
+format = 󰍛
+format-padding = 1
+click-left = kitty -e btop
 
 [module/battery]
 type = internal/battery
@@ -152,50 +165,42 @@ full-at = 98
 low-at = 15
 poll-interval = 5
 
-format-charging = <animation-charging> <label-charging>
-format-charging-foreground = ${colors.green}
+format-charging = <animation-charging>
 format-charging-padding = 1
-
-format-discharging = <ramp-capacity> <label-discharging>
-format-discharging-foreground = ${colors.yellow}
+format-discharging = <ramp-capacity>
 format-discharging-padding = 1
-
-format-full =  <label-full>
-format-full-foreground = ${colors.green}
+format-full = 󰂅
 format-full-padding = 1
-
-format-low = <animation-low> <label-low>
+format-low = <ramp-capacity> <label-low>
 format-low-foreground = ${colors.alert}
 format-low-padding = 1
+label-low = %percentage%%
 
-label-charging = %percentage%%
-label-discharging = %percentage%%
-label-full = Full
-label-low = %percentage%% LOW
+ramp-capacity-0 = 󰁺
+ramp-capacity-1 = 󰁻
+ramp-capacity-2 = 󰁼
+ramp-capacity-3 = 󰁽
+ramp-capacity-4 = 󰁾
+ramp-capacity-5 = 󰁿
+ramp-capacity-6 = 󰂀
+ramp-capacity-7 = 󰂁
+ramp-capacity-8 = 󰂂
+ramp-capacity-9 = 󰁹
 
-ramp-capacity-0 =
-ramp-capacity-1 =
-ramp-capacity-2 =
-ramp-capacity-3 =
-ramp-capacity-4 =
-
-animation-charging-0 =
-animation-charging-1 =
-animation-charging-2 =
-animation-charging-3 =
-animation-charging-4 =
+animation-charging-0 = 󰢜
+animation-charging-1 = 󰂆
+animation-charging-2 = 󰂇
+animation-charging-3 = 󰂈
+animation-charging-4 = 󰢝
+animation-charging-5 = 󰂉
+animation-charging-6 = 󰢞
+animation-charging-7 = 󰂊
+animation-charging-8 = 󰂋
+animation-charging-9 = 󰂅
 animation-charging-framerate = 750
 
-animation-low-0 =
-animation-low-1 =
-animation-low-framerate = 500
-
-[module/power]
-type = custom/text
-format = " ⏻ "
-format-foreground = ${colors.alert}
 click-left = ~/.local/bin/dots-power
 
 [settings]
 screenchange-reload = true
-pseudo-transparency = true
+pseudo-transparency = false

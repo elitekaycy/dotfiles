@@ -74,12 +74,23 @@ element {
     border-radius: 6px;
 }
 
-element normal.normal {
+element normal.normal,
+element alternate.normal,
+element normal.active,
+element alternate.active {
     background-color: transparent;
     text-color: @fg;
 }
 
-element selected.normal {
+element normal.urgent,
+element alternate.urgent {
+    background-color: transparent;
+    text-color: @red;
+}
+
+element selected.normal,
+element selected.active,
+element selected.urgent {
     background-color: @blue;
     text-color: @bg;
 }

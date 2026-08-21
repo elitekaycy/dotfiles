@@ -6,7 +6,7 @@ current="$(nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '$1 == "yes" {
 wifi_dev="$(nmcli -t -f DEVICE,TYPE dev 2>/dev/null | awk -F: '$2 == "wifi" { print $1; exit }')"
 
 toggle="󰖩  Toggle WiFi"
-scan="  Scan Networks"
+scan="󰑐  Scan Networks"
 disconnect="󰖪  Disconnect"
 
 rows=("$toggle" "$scan")
@@ -18,7 +18,7 @@ while IFS=':' read -r ssid signal security; do
     lock=""
     [[ -n "$security" && "$security" != "--" ]] && lock="  󰌾"
     mark=""
-    [[ "$ssid" == "$current" ]] && mark="  "
+    [[ "$ssid" == "$current" ]] && mark="  󰄬"
     rows+=("$icon  $ssid$lock$mark")
 done < <(nmcli -t -f SSID,SIGNAL,SECURITY dev wifi list 2>/dev/null | grep -v '^:' | sort -t: -k2 -rn | awk -F: '!seen[$1]++')
 

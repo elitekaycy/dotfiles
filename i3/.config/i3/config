@@ -172,10 +172,6 @@ exec --no-startup-id xss-lock -- ~/.local/bin/dots-lock
 # Clipboard daemon
 exec --no-startup-id greenclip daemon
 
-# System tray
-exec --no-startup-id nm-applet
-exec --no-startup-id volumeicon
-exec --no-startup-id blueman-applet
 
 # Fast keyboard repeat (200ms delay, 50/sec rate)
 exec --no-startup-id xset r rate 200 50

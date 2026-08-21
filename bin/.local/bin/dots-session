@@ -47,11 +47,11 @@ session_scalestash() {
 }
 
 if [[ "${1:-}" == "--menu" ]]; then
-    rows=("  main" "  work" "  scalestash")
+    rows=("󰆍  main" "󰆍  work" "󰆍  scalestash")
     while IFS= read -r existing; do
         [[ -n "$existing" ]] || continue
         case "$existing" in main|work|scalestash) continue ;; esac
-        rows+=("  $existing")
+        rows+=("󰆍  $existing")
     done < <(tmux list-sessions -F '#S' 2>/dev/null || true)
     chosen="$(printf '%s\n' "${rows[@]}" | rofi -dmenu -i -p "Session" -no-custom \
         -theme-str 'window { width: 22em; }' \

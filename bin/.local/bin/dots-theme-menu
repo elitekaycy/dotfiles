@@ -25,10 +25,10 @@ for theme_file in "$THEMES_CONF_DIR"/*.conf; do
         esac
     done < "$theme_file"
 
-    icon=""
-    [[ "$theme_type" == "light" ]] && icon=""
+    icon="󰖔"
+    [[ "$theme_type" == "light" ]] && icon="󰖙"
     marker=""
-    [[ "$theme_id" == "$current" ]] && marker="  "
+    [[ "$theme_id" == "$current" ]] && marker="  󰄬"
 
     theme_ids+=("$theme_id")
     rows+=("$icon  $theme_name$marker  ($theme_type)")

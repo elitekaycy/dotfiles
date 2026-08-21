@@ -14,7 +14,7 @@ confirm() {
     [[ "$(printf 'Yes\nNo\n' | menu "Confirm $1?" 2)" == "Yes" ]]
 }
 
-chosen="$(printf '%s\n' "  Lock" "󰍃  Logout" "󰤄  Suspend" "󰒲  Hibernate" "  Reboot" "  Shutdown" | menu "Power" 6)" || exit 0
+chosen="$(printf '%s\n' "󰌾  Lock" "󰍃  Logout" "󰤄  Suspend" "󰒲  Hibernate" "󰜉  Reboot" "󰐥  Shutdown" | menu "Power" 6)" || exit 0
 
 case "${chosen##*  }" in
     Lock)      "$BIN_DIR/dots-lock" ;;
