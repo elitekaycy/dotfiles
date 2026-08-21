@@ -67,6 +67,19 @@ ci(verify): test upgrades from an existing home
 
 Avoid vague subjects such as `update files`, `fix stuff`, or `changes`. Keep commits focused; do not mix unrelated generated files, personal state, or nested submodule work into a dotfiles commit.
 
+## Commit hygiene
+
+- No co-authored-by trailers, signed-off-by, or attribution footers.
+- One logical change per commit. Do not bundle unrelated fixes.
+- Never commit generated files (config.ini, theme.conf, dunstrc, config.rasi), runtime state (undo files, swap files, session data), or secrets (.env, tokens, passwords).
+- Never commit the pvim submodule as dirty. If pvim has local runtime changes, leave it unstaged.
+- Subject line: imperative mood, under 72 characters, no trailing period.
+- Body: explain *why*, not *what*. The diff shows what changed; the body explains the motivation, trade-off, or risk.
+- Review `git diff --staged` before every commit. If a file looks wrong, unstage it.
+- Prefer `git add <file>` over `git add .` to avoid accidentally staging unrelated changes.
+- Do not amend published commits. Create a new commit instead.
+- Do not force-push to main.
+
 ## Change-specific rules
 
 - Theme: add a `.conf` source file and matching wallpaper, then test CLI rendering with `--no-reload`.
