@@ -17,22 +17,22 @@ magenta = {{MAGENTA}}
 
 [bar/main]
 monitor = ${env:MONITOR:}
-width = ${env:BAR_WIDTH:48%}
-height = 42
+width = 100%
+height = 36
 dpi = 96
-radius = 21
-offset-x = ${env:BAR_OFFSET_X:26%}
-offset-y = 10
-bottom = true
+radius = 0
+offset-x = 0
+offset-y = 0
+bottom = false
 fixed-center = true
-override-redirect = true
+override-redirect = false
 
 background = ${colors.background}
 foreground = ${colors.foreground}
 
 line-size = 2
 
-border-size = 6
+border-size = 0
 border-color = #00000000
 
 padding-left = 2
@@ -54,7 +54,7 @@ cursor-click = pointer
 cursor-scroll = ns-resize
 
 enable-ipc = true
-enable-struts = false
+enable-struts = true
 
 wm-restack = i3
 
