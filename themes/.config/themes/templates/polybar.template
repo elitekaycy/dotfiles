@@ -56,8 +56,6 @@ cursor-scroll = ns-resize
 enable-ipc = true
 enable-struts = true
 
-wm-restack = i3
-
 ;==========================================================
 ;   Modules
 ;==========================================================
