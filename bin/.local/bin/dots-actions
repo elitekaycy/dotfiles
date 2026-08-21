@@ -28,7 +28,6 @@ ACTIONS=(
     "󰆍  Session: main|tmux terminal|kitty -e $BIN_DIR/dots-session main"
     "󰆍  Session: work|tmux terminal|kitty -e $BIN_DIR/dots-session work"
     "󰆍  Session: scalestash|tmux terminal project|kitty -e $BIN_DIR/dots-session scalestash"
-    "󰆍  Session: qkt|tmux terminal project quant insights research mt5|kitty -e $BIN_DIR/dots-session qkt"
     "󰆍  Session: pick|tmux terminal list|$BIN_DIR/dots-session --menu"
     "󰩭  Screenshot area|capture flameshot region|$BIN_DIR/dots-screenshot area"
     "󰹑  Screenshot full|capture flameshot screen|$BIN_DIR/dots-screenshot full"
