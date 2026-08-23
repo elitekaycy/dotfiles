@@ -248,7 +248,7 @@ Shell: `tn <name>` new, `ta <name>` attach, `tl` list, `tk <name>` kill.
 └── pvim/.config/pvim/            # Neovim config (git submodule)
 ```
 
-Generated and untracked: `polybar/config.ini`, `kitty/theme.conf`, `dunst/dunstrc`, `rofi/config.rasi`, `i3/theme.conf`, `tmux/theme.conf`.
+Generated and untracked: `polybar/config.ini`, `kitty/theme.conf`, `dunst/dunstrc`, `rofi/config.rasi`, `i3/theme.conf`, `tmux/theme.conf`, `nvim/lazyvim.json`.
 
 ## Verify before committing
 
