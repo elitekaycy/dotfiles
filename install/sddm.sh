@@ -5,6 +5,11 @@
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
 SDDM_THEME_REPO="https://github.com/Keyitdev/sddm-astronaut-theme.git"
+# Upstream HEAD needs a Qt >= 6.5 greeter. Debian/Ubuntu ship a Qt5 greeter
+# (last Qt5 release of the theme); Fedora/Arch ship a Qt6 greeter (last
+# release before QtQuick.Effects). Both read the same theme.conf keys.
+SDDM_THEME_REV_QT5="0e721d2"
+SDDM_THEME_REV_QT6="48ea0a7"
 SDDM_THEME_DIR="/usr/share/sddm/themes/sddm-astronaut-theme"
 
 install_sddm() {
@@ -18,27 +23,34 @@ install_sddm() {
             sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
                 sddm \
                 git \
-                libqt6svg6 \
-                libxcb-cursor0 \
-                qml6-module-qtquick-controls \
-                qml6-module-qtquick-layouts \
-                qml6-module-qtquick-effects \
-                qml6-module-qt5compat-graphicaleffects \
-                qml6-module-qtquick-virtualkeyboard \
-                qml6-module-qtmultimedia
+                libqt5svg5 \
+                qml-module-qtquick2 \
+                qml-module-qtquick-controls2 \
+                qml-module-qtquick-layouts \
+                qml-module-qtgraphicaleffects \
+                qml-module-qtquick-virtualkeyboard
             ;;
         fedora)
-            pkg_install sddm git qt6-qtsvg qt6-qtvirtualkeyboard qt6-qtmultimedia
+            pkg_install sddm git qt6-qtsvg qt6-qt5compat qt6-qtvirtualkeyboard qt6-qtmultimedia
             ;;
         arch)
-            pkg_install sddm git qt6-svg qt6-virtualkeyboard qt6-multimedia-ffmpeg
+            pkg_install sddm git qt6-svg qt6-5compat qt6-virtualkeyboard qt6-multimedia-ffmpeg
             ;;
     esac
 
-    if [[ ! -d "$SDDM_THEME_DIR" ]]; then
+    if [[ ! -d "$SDDM_THEME_DIR/.git" ]]; then
         log_info "Cloning sddm-astronaut-theme..."
-        sudo git clone --depth 1 "$SDDM_THEME_REPO" "$SDDM_THEME_DIR"
+        sudo git clone "$SDDM_THEME_REPO" "$SDDM_THEME_DIR"
     fi
+    local rev="$SDDM_THEME_REV_QT6"
+    [[ "$OS" == "debian" ]] && rev="$SDDM_THEME_REV_QT5"
+    sudo git -C "$SDDM_THEME_DIR" checkout -q -f "$rev"
+
+    # The Qt5 release references Assets/*.svgz but ships plain .svg files.
+    local svg
+    for svg in "$SDDM_THEME_DIR"/Assets/*.svg; do
+        [[ -e "${svg}z" ]] || gzip -c "$svg" | sudo tee "${svg}z" >/dev/null
+    done
 
     # The greeter runs as the sddm user: it needs the UI font system-wide.
     local font_src="$HOME/.local/share/fonts/JetBrainsMonoNerd"
@@ -54,6 +66,7 @@ install_sddm() {
     user="$(id -un)"
     group="$(id -gn)"
     sudo install -d -m 755 -o "$user" -g "$group" "$SDDM_THEME_DIR/Backgrounds/dotfiles"
+    sudo install -d -m 755 -o "$user" -g "$group" "$SDDM_THEME_DIR/Themes"
     [[ -e "$SDDM_THEME_DIR/Themes/dotfiles.conf" ]] || sudo touch "$SDDM_THEME_DIR/Themes/dotfiles.conf"
     sudo chown "$user:$group" "$SDDM_THEME_DIR/Themes/dotfiles.conf"
     sudo chmod 644 "$SDDM_THEME_DIR/Themes/dotfiles.conf"

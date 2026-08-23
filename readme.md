@@ -111,7 +111,7 @@ Templates are in `themes/.config/themes/templates/`; edit one when *every* theme
 ### Lock and login screens
 
 - **Lock** (`Mod+Escape`, suspend via `xss-lock`): `dots-lock` runs `i3lock-color` with a blurred screenshot, a clock inside a ring indicator and `user@host` below it, all in the active theme's colours. `./install.sh i3` builds it as `/usr/local/bin/i3lock-color`; without it, `dots-lock` falls back to the distro `i3lock` in the theme background colour.
-- **Login**: `./install.sh login` installs SDDM and clones the astronaut theme into `/usr/share/sddm/themes/`, points it at `Themes/dotfiles.conf`, makes that file and `Backgrounds/dotfiles/` user-owned, and enables `sddm.service` in place of GDM. From then on `dots-login-sync` (called by `dots-theme-set` and `dots-bg-set`) rewrites the login colours and copies the current wallpaper there, so the login screen always matches the desktop. Reboot once after installing.
+- **Login**: `./install.sh login` installs SDDM and clones the astronaut theme (pinned to its last Qt5 release on Debian/Ubuntu, whose `sddm-greeter` is Qt5, and to its last pre-`QtQuick.Effects` release on Fedora/Arch) into `/usr/share/sddm/themes/`, points it at `Themes/dotfiles.conf`, makes that file and `Backgrounds/dotfiles/` user-owned, and enables `sddm.service` in place of GDM. From then on `dots-login-sync` (called by `dots-theme-set` and `dots-bg-set`) rewrites the login colours and copies the current wallpaper there, so the login screen always matches the desktop. Reboot once after installing.
 
 ## Wallpapers
 
