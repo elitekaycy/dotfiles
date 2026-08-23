@@ -78,6 +78,7 @@ All live in `bin/.local/bin/` and are on `PATH` as `~/.local/bin/dots-*`.
 | `dots-screenshot area\|full\|clip` | Flameshot |
 | `dots-lock` | Lock: blurred desktop, clock and ring in the theme colours (i3lock-color; plain i3lock fallback) |
 | `dots-grep [query] [dir]` | Live content search: ripgrep results fuzzy-filtered in fzf with a `bat` preview; Enter opens the file in `$EDITOR` at that line |
+| `dots-stats` | Quick stats dropdown (rofi): CPU, memory, disk, temperature, battery, uptime, kernel |
 | `dots-login-sync` | Re-render the SDDM login screen from the theme + current wallpaper (run automatically on theme/wallpaper change) |
 
 ## Themes
@@ -218,10 +219,11 @@ dots-monitors forget    # back to the default arrangement
 | --- | --- |
 | `Mod+Escape` | Lock |
 | `Mod+g` | Grep search (`dots-grep`, opens in Kitty) |
+| `Mod+i` | Quick system stats (`dots-stats`) |
 | `Mod+Shift+s` / `Mod+Shift+f` / `Mod+Shift+c` | Screenshot area / full / area→clipboard |
 | `XF86 brightness / volume / media keys` | brightnessctl, pactl, playerctl |
 
-Polybar (icons only, left → right): `≡` menu (click: `dots-menu`, right-click: Kitty) · workspaces 1–5 always, 6–10 when used (dot = active, click to switch) · clock (click: `dots-menu`) · tray · bluetooth (`dots-bluetooth`) · wifi (`dots-wifi`) · audio (click: `pavucontrol`, right-click: mute, scroll: volume) · cpu (`btop`) · battery (`dots-power`).
+Polybar (icons only, left → right): `≡` menu (click: `dots-menu`, right-click: Kitty) · workspaces 1–5 always, 6–10 when used (dot = active, click to switch) · clock (click: `dots-menu`) · tray · bluetooth (`dots-bluetooth`) · wifi (`dots-wifi`) · audio (click: `pavucontrol`, right-click: mute, scroll: volume) · cpu / memory (click: `btop`, right-click: `dots-stats`) · battery (`dots-power`).
 
 ### tmux (prefix `Ctrl+g`)
 

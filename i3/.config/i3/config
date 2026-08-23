@@ -47,6 +47,9 @@ bindsym $mod+v exec rofi -modi "clipboard:greenclip print" -show clipboard
 # Grep search: fuzzy live content search (ripgrep + fzf), opens the pick in $EDITOR
 bindsym $mod+g exec --no-startup-id kitty -e ~/.local/bin/dots-grep
 
+# Quick system stats (CPU, memory, disk, temp, battery, uptime)
+bindsym $mod+i exec --no-startup-id ~/.local/bin/dots-stats
+
 # Main menu hub (Omarchy-style): apps, theme, wallpaper, sessions, wifi, power...
 bindsym $mod+Mod1+space exec --no-startup-id ~/.local/bin/dots-menu
 

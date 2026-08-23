@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Quick system stats as a rofi dropdown: CPU, memory, disk, temperature,
+# battery, uptime. Informational only (Esc or Enter both just close it).
+set -Eeuo pipefail
+
+cpu_percent() {
+    local read1 read2 idle1 idle2 total1 total2
+    read1="$(awk '/^cpu /{print}' /proc/stat)"
+    sleep 0.2
+    read2="$(awk '/^cpu /{print}' /proc/stat)"
+    idle1="$(awk '{print $5}' <<<"$read1")"
+    idle2="$(awk '{print $5}' <<<"$read2")"
+    total1="$(awk '{s=0; for(i=2;i<=NF;i++) s+=$i; print s}' <<<"$read1")"
+    total2="$(awk '{s=0; for(i=2;i<=NF;i++) s+=$i; print s}' <<<"$read2")"
+    awk -v i1="$idle1" -v i2="$idle2" -v t1="$total1" -v t2="$total2" \
+        'BEGIN { d=t2-t1; if (d<=0) { print "n/a"; exit } printf "%.0f%%", 100*(1-(i2-i1)/d) }'
+}
+
+memory_line() {
+    free -b | awk '/^Mem:/{
+        used=$3; total=$2
+        printf "%.1fG / %.1fG (%.0f%%)", used/1073741824, total/1073741824, 100*used/total
+    }'
+}
+
+disk_line() {
+    df -h / | awk 'NR==2 { printf "%s / %s (%s)", $3, $2, $5 }'
+}
+
+temp_line() {
+    sensors 2>/dev/null | awk '
+        /^CPU:/ { print $2; found=1; exit }
+        /^Package id 0:/ { print $4; found=1; exit }
+        /^Tctl:/ { print $2; found=1; exit }
+        END { if (!found) print "n/a" }
+    '
+}
+
+battery_line() {
+    local bat="/sys/class/power_supply/BAT1"
+    [[ -d "$bat" ]] || { echo "n/a"; return; }
+    local cap status
+    cap="$(<"$bat/capacity")"
+    status="$(<"$bat/status")"
+    echo "${cap}% (${status})"
+}
+
+rows=(
+    "󰍛  CPU: $(cpu_percent)"
+    "󰘚  Memory: $(memory_line)"
+    "󰋊  Disk: $(disk_line)"
+    "󰔏  Temp: $(temp_line)"
+    "󰁹  Battery: $(battery_line)"
+    "󰅐  Uptime: $(uptime -p | sed 's/^up //')"
+    "󰌽  Kernel: $(uname -r)"
+)
+
+printf '%s\n' "${rows[@]}" | rofi -dmenu -i -p "󰋼 System stats" -no-custom \
+    -theme-str 'window { width: 32em; }' \
+    -theme-str 'listview { lines: 7; }' >/dev/null || exit 0

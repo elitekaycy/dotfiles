@@ -37,6 +37,7 @@ ACTIONS=(
     "󰌌  Keybindings|keys shortcuts help|$BIN_DIR/dots-keys"
     "󰌆  Secrets: copy|password key token keyring vault api|$BIN_DIR/dots-secret menu"
     "󰍛  System monitor|btop cpu memory processes top|kitty -e btop"
+    "󰋼  System stats|quick stats cpu memory disk temperature battery uptime|$BIN_DIR/dots-stats"
     "󰍹  Monitors: arrange|display screen hdmi external arandr layout dual|$BIN_DIR/dots-monitors arrange"
     "󰍹  Monitors: save layout|display screen hdmi external remember dual|$BIN_DIR/dots-monitors save"
     "󰍹  Monitors: reset layout|display screen hdmi external default forget dual|$BIN_DIR/dots-monitors forget; $BIN_DIR/dots-monitors apply"
