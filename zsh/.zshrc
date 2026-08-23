@@ -94,6 +94,7 @@ fi
 # --- Aliases ----------------------------------------------------------------
 alias pvim='NVIM_APPNAME=pvim command nvim'
 alias pvi='NVIM_APPNAME=pvim command nvim'
+export EDITOR=pvim VISUAL=pvim
 command -v bat &>/dev/null && alias cat="bat"
 command -v eza &>/dev/null && alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions"
 alias broot='br'

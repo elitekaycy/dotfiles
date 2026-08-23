@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Real, PATH-resolvable pvim so $EDITOR/$VISUAL and scripts (dots-grep,
+# git commit, etc.) launch the pvim config, not stock nvim. The zsh
+# aliases (pvim/pvi) shadow this interactively; this is what non-interactive
+# programs exec.
+exec env NVIM_APPNAME=pvim nvim "$@"

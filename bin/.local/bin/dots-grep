@@ -28,6 +28,6 @@ file="$(cut -d: -f1 <<<"$result")"
 line="$(cut -d: -f2 <<<"$result")"
 
 case "$(basename "$editor")" in
-    nvim|vim|vi) exec "$editor" "+$line" "$file" ;;
+    nvim|vim|vi|pvim|pvi) exec "$editor" "+$line" "$file" ;;
     *)           exec "$editor" "$file" ;;
 esac
