@@ -30,6 +30,7 @@ dust = "latest"
 k9s = "latest"
 glow = "latest"
 direnv = "latest"
+uv = "latest"
 
 [settings]
 experimental = true
