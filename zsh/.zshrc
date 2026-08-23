@@ -81,6 +81,16 @@ _fzf_comprun() {
     esac
 }
 
+# Ctrl+g: live content search (dots-grep) in the current directory
+if command -v dots-grep &>/dev/null; then
+    dots-grep-widget() {
+        dots-grep "" "$PWD" </dev/tty >/dev/tty
+        zle reset-prompt
+    }
+    zle -N dots-grep-widget
+    bindkey '^G' dots-grep-widget
+fi
+
 # --- Aliases ----------------------------------------------------------------
 alias pvim='NVIM_APPNAME=pvim command nvim'
 alias pvi='NVIM_APPNAME=pvim command nvim'

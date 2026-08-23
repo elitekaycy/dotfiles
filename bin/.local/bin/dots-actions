@@ -25,6 +25,7 @@ ACTIONS=(
     "󰖀  Volume down|sound audio quieter -5|pactl set-sink-volume @DEFAULT_SINK@ -5%"
     "󰝟  Volume mute toggle|sound audio silence|pactl set-sink-mute @DEFAULT_SINK@ toggle"
     "󰕿  Audio settings|sound output input pavucontrol|pavucontrol"
+    "  Grep search|find text content ripgrep fzf|kitty -e $BIN_DIR/dots-grep"
     "󰆍  Session: main|tmux terminal|kitty -e $BIN_DIR/dots-session main"
     "󰆍  Session: work|tmux terminal|kitty -e $BIN_DIR/dots-session work"
     "󰆍  Session: scalestash|tmux terminal project|kitty -e $BIN_DIR/dots-session scalestash"

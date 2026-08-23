@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Live content search: ripgrep results, fuzzy-filtered and previewed in fzf,
+# opens the pick in $EDITOR at the matched line.
+#
+#   dots-grep [query] [dir]
+set -Eeuo pipefail
+
+query="${1:-}"
+dir="${2:-.}"
+cd -- "$dir"
+
+editor="${EDITOR:-nvim}"
+rg_cmd='rg --column --line-number --no-heading --color=always --smart-case -- {q} || true'
+
+result="$(
+    fzf --ansi --disabled --query "$query" \
+        --delimiter : \
+        --bind "start:reload:$rg_cmd" \
+        --bind "change:reload:$rg_cmd" \
+        --preview 'bat --color=always --style=numbers --highlight-line={2} {1}' \
+        --preview-window '+{2}-/2' \
+        --header 'enter: open at line   ctrl-c: cancel'
+)"
+
+[[ -n "$result" ]] || exit 0
+
+file="$(cut -d: -f1 <<<"$result")"
+line="$(cut -d: -f2 <<<"$result")"
+
+case "$(basename "$editor")" in
+    nvim|vim|vi) exec "$editor" "+$line" "$file" ;;
+    *)           exec "$editor" "$file" ;;
+esac

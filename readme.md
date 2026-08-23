@@ -77,6 +77,7 @@ All live in `bin/.local/bin/` and are on `PATH` as `~/.local/bin/dots-*`.
 | `dots-wifi` / `dots-bluetooth` | Rofi network menus (also opened by clicking the Polybar modules) |
 | `dots-screenshot area\|full\|clip` | Flameshot |
 | `dots-lock` | Lock: blurred desktop, clock and ring in the theme colours (i3lock-color; plain i3lock fallback) |
+| `dots-grep [query] [dir]` | Live content search: ripgrep results fuzzy-filtered in fzf with a `bat` preview; Enter opens the file in `$EDITOR` at that line |
 | `dots-login-sync` | Re-render the SDDM login screen from the theme + current wallpaper (run automatically on theme/wallpaper change) |
 
 ## Themes
@@ -216,6 +217,7 @@ dots-monitors forget    # back to the default arrangement
 | Key | Action |
 | --- | --- |
 | `Mod+Escape` | Lock |
+| `Mod+g` | Grep search (`dots-grep`, opens in Kitty) |
 | `Mod+Shift+s` / `Mod+Shift+f` / `Mod+Shift+c` | Screenshot area / full / area→clipboard |
 | `XF86 brightness / volume / media keys` | brightnessctl, pactl, playerctl |
 

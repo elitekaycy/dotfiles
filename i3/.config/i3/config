@@ -44,6 +44,9 @@ bindsym $mod+Escape exec --no-startup-id ~/.local/bin/dots-lock
 # Clipboard manager (rofi-greenclip)
 bindsym $mod+v exec rofi -modi "clipboard:greenclip print" -show clipboard
 
+# Grep search: fuzzy live content search (ripgrep + fzf), opens the pick in $EDITOR
+bindsym $mod+g exec --no-startup-id kitty -e ~/.local/bin/dots-grep
+
 # Main menu hub (Omarchy-style): apps, theme, wallpaper, sessions, wifi, power...
 bindsym $mod+Mod1+space exec --no-startup-id ~/.local/bin/dots-menu
 
