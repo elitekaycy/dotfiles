@@ -4,6 +4,10 @@
 # background colour when i3lock-color is not installed (./install.sh i3).
 set -Eeuo pipefail
 
+# Key auto-repeat fires the binding several times; only the first instance
+# can grab the keyboard, the rest would flash "lock failed" and exit.
+pgrep -u "$UID" -x 'i3lock(-color)?' >/dev/null && exit 0
+
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 theme="$(cat "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/theme" 2>/dev/null || echo tokyo-night)"
 
