@@ -81,7 +81,7 @@ All live in `bin/.local/bin/` and are on `PATH` as `~/.local/bin/dots-*`.
 
 ## Themes
 
-Available: `matte-black` (darkest, Omarchy palette) `nebula` (JWST Tarantula Nebula) `tokyo-night` `tokyo-night-light` `catppuccin-mocha` `catppuccin-latte` `dracula` `gruvbox-dark` `gruvbox-light` `nord` `nord-light`
+Available: `matte-black` (darkest, Omarchy palette) `akatsuki` (black & blood red) `nebula` (JWST Tarantula Nebula) `tokyo-night` `tokyo-night-light` `catppuccin-mocha` `catppuccin-latte` `dracula` `gruvbox-dark` `gruvbox-light` `nord` `nord-light`
 
 What one theme drives:
 
