@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Render the login screen (SDDM astronaut theme) from the active theme and the
+# current wallpaper. Called by dots-theme-set and dots-bg-set; does nothing
+# until ./install.sh login has made the theme's dotfiles slots user-writable.
+set -Eeuo pipefail
+
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles"
+SDDM_THEME_DIR="${DOTFILES_SDDM_THEME_DIR:-/usr/share/sddm/themes/sddm-astronaut-theme}"
+TEMPLATE="$CONFIG_HOME/themes/templates/sddm.template"
+
+conf="$SDDM_THEME_DIR/Themes/dotfiles.conf"
+bg_dir="$SDDM_THEME_DIR/Backgrounds/dotfiles"
+[[ -w "$conf" && -w "$bg_dir" && -f "$TEMPLATE" ]] || exit 0
+
+theme="$(cat "$STATE_DIR/theme" 2>/dev/null || echo tokyo-night)"
+theme_file="$CONFIG_HOME/themes/themes/$theme.conf"
+[[ -f "$theme_file" ]] || exit 0
+# shellcheck disable=SC1090
+source "$theme_file"
+
+# The greeter runs as the sddm user and cannot read $HOME, so copy the wallpaper.
+LOGIN_BACKGROUND=""
+wallpaper="$(cat "$CONFIG_HOME/current-wallpaper" 2>/dev/null || true)"
+if [[ -f "$wallpaper" ]]; then
+    ext="${wallpaper##*.}"
+    ext="${ext,,}"
+    find "$bg_dir" -maxdepth 1 -name 'wallpaper.*' -delete
+    cp -- "$wallpaper" "$bg_dir/wallpaper.$ext"
+    chmod 644 "$bg_dir/wallpaper.$ext"
+    LOGIN_BACKGROUND="Backgrounds/dotfiles/wallpaper.$ext"
+fi
+
+content="$(<"$TEMPLATE")"
+content="${content//\{\{LOGIN_BACKGROUND\}\}/$LOGIN_BACKGROUND}"
+for var in THEME_NAME THEME_TYPE BG BG_ALT FG FG_DIM PRIMARY SECONDARY ACCENT \
+    RED GREEN YELLOW BLUE MAGENTA CYAN WHITE BLACK; do
+    content="${content//\{\{$var\}\}/${!var}}"
+done
+printf '%s\n' "$content" > "$conf"

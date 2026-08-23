@@ -137,6 +137,9 @@ else
     log_warn "No wallpapers found in ${theme_bg_dir#"$HOME"/}"
 fi
 
+# Login screen (no-op until ./install.sh login).
+"$BIN_DIR/dots-login-sync"
+
 if [[ "$RELOAD_APPS" == "true" && -n "${DISPLAY:-}" ]]; then
     if [[ -x "$CONFIG_HOME/polybar/launch.sh" ]]; then
         "$CONFIG_HOME/polybar/launch.sh" >/dev/null 2>&1 &

@@ -9,7 +9,7 @@ My i3 workstation: i3 + Polybar + Rofi + Kitty + tmux + Zsh + Neovim (pvim), the
 ## How it fits together
 
 ```text
-themes/<id>.conf  ──►  dots-theme-set  ──►  polybar · kitty · dunst · rofi · i3 · tmux · pvim · wallpaper
+themes/<id>.conf  ──►  dots-theme-set  ──►  polybar · kitty · dunst · rofi · i3 · tmux · pvim · wallpaper · lock · login
                             ▲
    Mod+t / Mod+Ctrl+Shift+Space ── dots-theme-menu (rofi)
    Mod+Ctrl+t ──────────────────── dots-theme-next
@@ -18,6 +18,7 @@ themes/<id>.conf  ──►  dots-theme-set  ──►  polybar · kitty · duns
 
 - **One theme source** (`themes/.config/themes/themes/<id>.conf`) defines ~20 colours. `dots-theme-set` renders every app template from it and reloads the desktop. Nothing is hardcoded per app.
 - **Per-theme wallpapers** live in `wallpapers/<theme-id>/`; `wallpapers/shared/` works with any theme. Switching theme switches wallpaper; `Mod+Ctrl+Space` cycles within the theme.
+- **Lock and login match the theme.** `dots-lock` is i3lock-color (blurred desktop, clock, ring in the theme colours); the login screen is SDDM + [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme), re-rendered by `dots-login-sync` with the theme colours and the current wallpaper on every switch.
 - **Every picker is Rofi** and every action is a `dots-*` command, so i3, Polybar and the shell all call the same thing.
 - **Stow deploys** each package without folding directories; generated files are user state, never committed.
 
@@ -37,7 +38,8 @@ Conflicting unmanaged files are moved (never deleted) to `~/.local/state/dotfile
 | `./install.sh setup` | Links, wallpapers, theme, TPM plugins, pvim |
 | `./install.sh themes` | Render the saved theme (Tokyo Night on first use) |
 | `./install.sh wallpapers` | Copy `wallpapers/` into `~/Pictures/wallpapers/` |
-| `./install.sh core` / `i3` / `terminal` / `fonts` / `zsh` | System packages by area |
+| `./install.sh core` / `i3` / `terminal` / `fonts` / `zsh` | System packages by area (`i3` also builds i3lock-color) |
+| `./install.sh login` | SDDM + astronaut login screen; replaces GDM/LightDM, active after reboot |
 | `./install.sh devtools` / `languages` | Everything in the mise manifest |
 | `./install.sh docker` / `chrome` / `rust` / `nvidia` / `greenclip` / `slack` / `media` | Optional extras |
 | `./install.sh check` | Run the verification suite, change nothing |
@@ -74,7 +76,8 @@ All live in `bin/.local/bin/` and are on `PATH` as `~/.local/bin/dots-*`.
 | `dots-keys` | Searchable list of every i3 keybinding |
 | `dots-wifi` / `dots-bluetooth` | Rofi network menus (also opened by clicking the Polybar modules) |
 | `dots-screenshot area\|full\|clip` | Flameshot |
-| `dots-lock` | i3lock in the theme background colour |
+| `dots-lock` | Lock: blurred desktop, clock and ring in the theme colours (i3lock-color; plain i3lock fallback) |
+| `dots-login-sync` | Re-render the SDDM login screen from the theme + current wallpaper (run automatically on theme/wallpaper change) |
 
 ## Themes
 
@@ -91,7 +94,8 @@ What one theme drives:
 | i3 | `~/.config/i3/theme.conf` | `include` in i3 config; `i3-msg reload` |
 | tmux | `~/.config/tmux/theme.conf` | `source-file` in `.tmux.conf`; live reload |
 | pvim | `~/.local/share/nvim/pvim_theme.txt` | read on startup |
-| Lockscreen | — | `dots-lock` reads the theme background |
+| Lockscreen | — | `dots-lock` reads the theme colours at lock time |
+| Login (SDDM) | `/usr/share/sddm/themes/sddm-astronaut-theme/Themes/dotfiles.conf` + `Backgrounds/dotfiles/` | user-owned slots written by `dots-login-sync`; shown at next login |
 | Wallpaper | `~/.config/current-wallpaper` | first file in `wallpapers/<id>/` unless the current one already belongs to the theme |
 
 Selected id: `~/.local/state/dotfiles/theme`.
@@ -102,7 +106,12 @@ Selected id: `~/.local/state/dotfiles/theme`.
 2. Put one or more wallpapers in `wallpapers/<id>/`.
 3. `./update.sh --local --configs-only`, then `Mod+t`.
 
-Templates are in `themes/.config/themes/templates/`; edit one when *every* theme should render a new setting. Placeholders: `{{BG}} {{BG_HEX}} {{BG_ALT}} {{FG}} {{FG_DIM}} {{PRIMARY}} {{SECONDARY}} {{ACCENT}} {{RED}} {{GREEN}} {{YELLOW}} {{BLUE}} {{MAGENTA}} {{CYAN}} {{WHITE}} {{BLACK}} {{THEME_NAME}} {{THEME_TYPE}}`.
+Templates are in `themes/.config/themes/templates/`; edit one when *every* theme should render a new setting. Placeholders: `{{BG}} {{BG_HEX}} {{BG_ALT}} {{FG}} {{FG_DIM}} {{PRIMARY}} {{SECONDARY}} {{ACCENT}} {{RED}} {{GREEN}} {{YELLOW}} {{BLUE}} {{MAGENTA}} {{CYAN}} {{WHITE}} {{BLACK}} {{THEME_NAME}} {{THEME_TYPE}}`. `sddm.template` additionally gets `{{LOGIN_BACKGROUND}}` (the wallpaper copied into the theme).
+
+### Lock and login screens
+
+- **Lock** (`Mod+Escape`, suspend via `xss-lock`): `dots-lock` runs `i3lock-color` with a blurred screenshot, a clock inside a ring indicator and `user@host` below it, all in the active theme's colours. `./install.sh i3` builds it as `/usr/local/bin/i3lock-color`; without it, `dots-lock` falls back to the distro `i3lock` in the theme background colour.
+- **Login**: `./install.sh login` installs SDDM and clones the astronaut theme into `/usr/share/sddm/themes/`, points it at `Themes/dotfiles.conf`, makes that file and `Backgrounds/dotfiles/` user-owned, and enables `sddm.service` in place of GDM. From then on `dots-login-sync` (called by `dots-theme-set` and `dots-bg-set`) rewrites the login colours and copies the current wallpaper there, so the login screen always matches the desktop. Reboot once after installing.
 
 ## Wallpapers
 
@@ -254,6 +263,8 @@ Conventions and commit rules: [`CLAUDE.md`](./CLAUDE.md).
 - Theme looks half-applied → `dots-theme-set $(dots-theme-current)`; check `~/.config/<app>/theme.conf` exists.
 - Wallpaper missing after a theme switch → `./install.sh wallpapers` (the theme directory in `~/Pictures/wallpapers/` is empty).
 - A `dots-*` command is missing → `./install.sh stow`.
+- Login screen not themed → `dots-login-sync` (needs `./install.sh login` first); the font is `JetBrainsMono Nerd Font` copied to `/usr/local/share/fonts/`.
+- Lock screen is a flat colour → i3lock-color is missing: `./install.sh i3`.
 - Restore an overwritten file from `~/.local/state/dotfiles/backups/`.
 - `./update.sh` exits `2` → local changes were preserved and upstream sync skipped; commit and rerun.
 

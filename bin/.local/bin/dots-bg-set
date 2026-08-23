@@ -19,6 +19,7 @@ fi
 [[ -f "$wallpaper" ]] || exit 0
 mkdir -p "$CONFIG_HOME"
 printf '%s\n' "$wallpaper" > "$STATE_FILE"
+"$(dirname "${BASH_SOURCE[0]}")/dots-login-sync"
 
 command -v feh >/dev/null || exit 0
 

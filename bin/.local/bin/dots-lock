@@ -1,12 +1,54 @@
 #!/usr/bin/env bash
-# Lock the screen with the active theme's background colour.
+# Lock the screen: blurred desktop, clock and a ring indicator in the active
+# theme's colours (i3lock-color). Falls back to plain i3lock in the theme
+# background colour when i3lock-color is not installed (./install.sh i3).
 set -Eeuo pipefail
 
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 theme="$(cat "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/theme" 2>/dev/null || echo tokyo-night)"
 
 BG="#1a1b26"
+FG="#c0caf5"
+FG_DIM="#565f89"
+PRIMARY="#7aa2f7"
+ACCENT="#7dcfff"
+RED="#f7768e"
+GREEN="#9ece6a"
 theme_file="$CONFIG_HOME/themes/themes/$theme.conf"
+# shellcheck disable=SC1090
 [[ -f "$theme_file" ]] && source "$theme_file"
 
-exec i3lock -c "${BG#\#}" "$@"
+# i3lock wants rrggbb[aa] without the leading '#'.
+rgba() { printf '%s%s' "${1#\#}" "${2:-ff}"; }
+
+if ! command -v i3lock-color >/dev/null; then
+    exec i3lock -c "$(rgba "$BG")" "$@"
+fi
+
+font="JetBrainsMono Nerd Font"
+exec i3lock-color \
+    --blur 8 \
+    --indicator --radius 110 --ring-width 6 \
+    --inside-color "$(rgba "$BG" b3)" \
+    --ring-color "$(rgba "$PRIMARY")" \
+    --line-uses-inside \
+    --separator-color "$(rgba "$BG" 00)" \
+    --keyhl-color "$(rgba "$ACCENT")" \
+    --bshl-color "$(rgba "$RED")" \
+    --insidever-color "$(rgba "$BG" b3)" \
+    --ringver-color "$(rgba "$GREEN")" \
+    --insidewrong-color "$(rgba "$BG" b3)" \
+    --ringwrong-color "$(rgba "$RED")" \
+    --clock --time-str "%H:%M" --date-str "%A, %d %B" \
+    --time-font "$font" --time-size 40 --time-color "$(rgba "$FG")" \
+    --date-font "$font" --date-size 13 --date-color "$(rgba "$FG_DIM")" \
+    --time-pos "ix:iy-8" --date-pos "tx:ty+28" \
+    --verif-font "$font" --verif-size 13 --verif-color "$(rgba "$FG")" --verif-text "verifying" \
+    --wrong-font "$font" --wrong-size 13 --wrong-color "$(rgba "$RED")" --wrong-text "wrong" \
+    --noinput-text "" --lock-text "" --lockfailed-text "lock failed" \
+    --greeter-font "$font" --greeter-size 14 --greeter-color "$(rgba "$FG_DIM")" \
+    --greeter-text "󰌾  ${USER}@${HOSTNAME:-$(hostname)}" --greeter-pos "ix:iy+r+44" \
+    --layout-font "$font" --layout-size 12 --layout-color "$(rgba "$FG_DIM")" \
+    --ignore-empty-password \
+    --pass-media-keys --pass-volume-keys --pass-screen-keys \
+    "$@"

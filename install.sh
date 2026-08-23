@@ -22,6 +22,7 @@ source "$INSTALL_DIR/docker.sh"
 source "$INSTALL_DIR/chrome.sh"
 source "$INSTALL_DIR/languages.sh"
 source "$INSTALL_DIR/nvidia.sh"
+source "$INSTALL_DIR/sddm.sh"
 source "$INSTALL_DIR/zen.sh"
 source "$INSTALL_DIR/pass.sh"
 source "$INSTALL_DIR/setup.sh"
@@ -42,7 +43,8 @@ show_help() {
     echo "  (none)     Install everything"
     echo "  core       Core packages (git, stow, curl, etc.)"
     echo "  nvidia     NVIDIA drivers (auto-detects GPU)"
-    echo "  i3         i3 window manager and tools"
+    echo "  i3         i3 window manager and tools (incl. i3lock-color lock screen)"
+    echo "  login      SDDM login screen (astronaut theme); replaces the current display manager"
     echo "  terminal   Kitty, tmux, zsh"
     echo "  devtools   All CLI tools via mise (bat, fd, fzf, eza, rg, etc.)"
     echo "  docker     Docker and Docker Compose"
@@ -90,6 +92,7 @@ main() {
     install_core
     install_nvidia
     install_i3
+    install_sddm
     install_greenclip
     install_terminal
     install_docker
@@ -196,6 +199,9 @@ case "${1:-}" in
         ;;
     nvidia)
         install_nvidia
+        ;;
+    login)
+        pkg_update && install_sddm
         ;;
     wallpapers)
         setup_wallpapers
