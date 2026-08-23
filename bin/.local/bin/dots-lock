@@ -22,7 +22,7 @@ theme_file="$CONFIG_HOME/themes/themes/$theme.conf"
 rgba() { printf '%s%s' "${1#\#}" "${2:-ff}"; }
 
 if ! command -v i3lock-color >/dev/null; then
-    exec i3lock -c "$(rgba "$BG")" "$@"
+    exec i3lock -c "${BG#\#}" "$@"
 fi
 
 font="JetBrainsMono Nerd Font"
