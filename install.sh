@@ -20,6 +20,7 @@ source "$INSTALL_DIR/slack.sh"
 source "$INSTALL_DIR/media.sh"
 source "$INSTALL_DIR/docker.sh"
 source "$INSTALL_DIR/chrome.sh"
+source "$INSTALL_DIR/pritunl.sh"
 source "$INSTALL_DIR/languages.sh"
 source "$INSTALL_DIR/nvidia.sh"
 source "$INSTALL_DIR/sddm.sh"
@@ -49,6 +50,7 @@ show_help() {
     echo "  devtools   All CLI tools via mise (bat, fd, fzf, eza, rg, etc.)"
     echo "  docker     Docker and Docker Compose"
     echo "  chrome     Google Chrome browser"
+    echo "  pritunl    Pritunl VPN client"
     echo "  languages  Node.js, Java, Python via mise"
     echo "  fonts      JetBrains Mono Nerd Font"
     echo "  greenclip  Clipboard manager"
@@ -193,6 +195,9 @@ case "${1:-}" in
         ;;
     chrome)
         install_chrome
+        ;;
+    pritunl)
+        pkg_update && install_pritunl
         ;;
     languages)
         install_languages

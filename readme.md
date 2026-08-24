@@ -41,7 +41,7 @@ Conflicting unmanaged files are moved (never deleted) to `~/.local/state/dotfile
 | `./install.sh core` / `i3` / `terminal` / `fonts` / `zsh` | System packages by area (`i3` also builds i3lock-color) |
 | `./install.sh login` | SDDM + astronaut login screen; replaces GDM/LightDM, active after reboot |
 | `./install.sh devtools` / `languages` | Everything in the mise manifest |
-| `./install.sh docker` / `chrome` / `rust` / `nvidia` / `greenclip` / `slack` / `media` | Optional extras |
+| `./install.sh docker` / `chrome` / `rust` / `nvidia` / `greenclip` / `slack` / `media` / `pritunl` | Optional extras |
 | `./install.sh check` | Run the verification suite, change nothing |
 
 ## Update
