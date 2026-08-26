@@ -136,3 +136,9 @@ compinit -C -d "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
 
 znap source zsh-users/zsh-autosuggestions
 znap source zsh-users/zsh-syntax-highlighting   # must be last
+
+# kimi-code
+export PATH="/home/elitekaycy/.kimi-code/bin:$PATH"
+
+# opencode
+export PATH=/home/elitekaycy/.opencode/bin:$PATH
