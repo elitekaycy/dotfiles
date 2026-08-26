@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# Screen recorder via ffmpeg (X11 x11grab + system audio), with pause/resume.
+# Recording keeps going straight through a lock (i3lock is just another X window).
+#
+#   dots-record start|stop|pause|resume|toggle
+#
+# State lives in $STATE_DIR: pid (running ffmpeg), segs (list of finished
+# segment files for this session), out (final output path chosen at start).
+set -Eeuo pipefail
+
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/dots-record"
+OUT_DIR="$HOME/Videos"
+PID_FILE="$STATE_DIR/pid"
+SEGS_FILE="$STATE_DIR/segs"
+OUT_FILE="$STATE_DIR/out"
+
+mkdir -p "$STATE_DIR" "$OUT_DIR"
+
+notify() { command -v notify-send >/dev/null && notify-send -r 9102 -t "${2:-2000}" "Screen recording" "$1" || true; }
+
+running() { [[ -f "$PID_FILE" ]] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; }
+paused()  { [[ -f "$SEGS_FILE" ]] && ! running; }
+
+start_segment() {
+    local seg
+    seg="$STATE_DIR/seg-$(date +%s%N).mp4"
+    local sink monitor
+    sink="$(pactl get-default-sink 2>/dev/null || true)"
+    monitor="${sink:+${sink}.monitor}"
+    local res
+    res="$(xrandr | awk '/\*/{print $1; exit}')"
+    if [[ -n "$monitor" ]]; then
+        ffmpeg -nostdin -loglevel error -y \
+            -f x11grab -video_size "$res" -framerate 30 -i "$DISPLAY" \
+            -f pulse -i "$monitor" \
+            -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a aac \
+            "$seg" >>"$STATE_DIR/ffmpeg.log" 2>&1 &
+    else
+        ffmpeg -nostdin -loglevel error -y \
+            -f x11grab -video_size "$res" -framerate 30 -i "$DISPLAY" \
+            -c:v libx264 -preset ultrafast -pix_fmt yuv420p \
+            "$seg" >>"$STATE_DIR/ffmpeg.log" 2>&1 &
+    fi
+    echo $! >"$PID_FILE"
+    echo "$seg" >>"$SEGS_FILE"
+}
+
+stop_segment() {
+    running || return 0
+    kill -INT "$(cat "$PID_FILE")" 2>/dev/null || true
+    for _ in $(seq 1 50); do running || break; sleep 0.1; done
+    rm -f "$PID_FILE"
+}
+
+finalize() {
+    stop_segment
+    [[ -f "$SEGS_FILE" ]] || { notify "Nothing to stop"; return 0; }
+    mapfile -t segs <"$SEGS_FILE"
+    local out
+    out="$OUT_DIR/recording-$(date +%Y%m%d-%H%M%S).mp4"
+    if (( ${#segs[@]} == 1 )); then
+        mv "${segs[0]}" "$out"
+    else
+        local list="$STATE_DIR/concat.txt"
+        printf "file '%s'\n" "${segs[@]}" >"$list"
+        ffmpeg -nostdin -loglevel error -y -f concat -safe 0 -i "$list" -c copy "$out"
+        rm -f "${segs[@]}" "$list"
+    fi
+    rm -f "$SEGS_FILE" "$OUT_FILE"
+    notify "Saved: $(basename "$out")" 4000
+}
+
+case "${1:-toggle}" in
+    start)
+        if running; then notify "Already recording"; exit 0; fi
+        rm -f "$SEGS_FILE"
+        start_segment
+        notify "Started"
+        ;;
+    pause)
+        running || { notify "Not recording"; exit 0; }
+        stop_segment
+        notify "Paused"
+        ;;
+    resume)
+        paused || { notify "Not paused"; exit 0; }
+        start_segment
+        notify "Resumed"
+        ;;
+    stop)
+        if ! running && ! paused; then notify "Not recording"; exit 0; fi
+        finalize
+        ;;
+    toggle)
+        if running; then stop_segment; notify "Paused"
+        elif paused; then start_segment; notify "Resumed"
+        else rm -f "$SEGS_FILE"; start_segment; notify "Started"
+        fi
+        ;;
+    *) echo "Usage: dots-record start|stop|pause|resume|toggle" >&2; exit 2 ;;
+esac

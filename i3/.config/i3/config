@@ -62,6 +62,10 @@ bindsym $mod+Ctrl+t exec --no-startup-id ~/.local/bin/dots-theme-next
 bindsym $mod+Shift+b exec --no-startup-id ~/.local/bin/dots-bg-menu
 bindsym $mod+Ctrl+space exec --no-startup-id ~/.local/bin/dots-bg-next
 
+# Screen recording: toggle start/pause/resume (Mod+Ctrl+r), stop & save (Mod+Ctrl+Shift+r)
+bindsym $mod+Ctrl+r exec --no-startup-id ~/.local/bin/dots-record toggle
+bindsym $mod+Ctrl+Shift+r exec --no-startup-id ~/.local/bin/dots-record stop
+
 # Keybinding reference
 bindsym $mod+Shift+slash exec --no-startup-id ~/.local/bin/dots-keys
 
